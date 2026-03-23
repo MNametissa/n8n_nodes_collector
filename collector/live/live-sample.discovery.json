@@ -1,0 +1,61 @@
+{
+  "source_urls": [
+    "https://docs.n8n.io/integrations/builtin/app-nodes/",
+    "https://docs.n8n.io/integrations/builtin/core-nodes/",
+    "https://docs.n8n.io/integrations/builtin/trigger-nodes/",
+    "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/",
+    "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/"
+  ],
+  "candidates": [
+    {
+      "url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+      "title": "Google Sheets",
+      "family": "action",
+      "source_url": "https://docs.n8n.io/integrations/builtin/app-nodes/",
+      "source_type": "node_page",
+      "context": [
+        "Built-in app nodes"
+      ]
+    },
+    {
+      "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.code/",
+      "title": "Code",
+      "family": "core",
+      "source_url": "https://docs.n8n.io/integrations/builtin/core-nodes/",
+      "source_type": "node_page",
+      "context": [
+        "Built-in core nodes"
+      ]
+    },
+    {
+      "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger/",
+      "title": "Schedule Trigger",
+      "family": "trigger",
+      "source_url": "https://docs.n8n.io/integrations/builtin/trigger-nodes/",
+      "source_type": "node_page",
+      "context": [
+        "Built-in trigger nodes"
+      ]
+    },
+    {
+      "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/",
+      "title": "AI Agent",
+      "family": "cluster_root",
+      "source_url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/",
+      "source_type": "node_page",
+      "context": [
+        "Built-in cluster root nodes"
+      ]
+    },
+    {
+      "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.lmchatopenai/",
+      "title": "OpenAI Chat Model",
+      "family": "cluster_sub",
+      "source_url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/",
+      "source_type": "node_page",
+      "context": [
+        "Built-in cluster sub nodes"
+      ]
+    }
+  ]
+}

@@ -69,6 +69,7 @@ def extract_node_group(
         if supporting_record.source_type != SourceType.SUPPORTING_PAGE:
             continue
         _, supporting_sections = extract_sections(Path(supporting_record.cache_path).read_text(encoding="utf-8"))
+        supporting_sections = normalize_supporting_sections(supporting_record.url, supporting_sections)
         merge_section_text(section_text, supporting_sections)
 
     return ExtractedNodeRecord(
@@ -139,6 +140,50 @@ def merge_section_text(target: dict[str, list[str]], source: dict[str, list[str]
                 existing.append(value)
 
 
+def normalize_supporting_sections(url: str, sections: dict[str, list[str]]) -> dict[str, list[str]]:
+    """Coerce supporting-page content into canonical section buckets when headings are page-specific."""
+
+    coerced_key = infer_supporting_section_key(url)
+    if coerced_key is None or coerced_key in sections:
+        return sections
+
+    flattened = flatten_supporting_sections(sections, include_heading_labels=coerced_key in {"common_issues", "operations"})
+    if not flattened:
+        return sections
+
+    normalized = dict(sections)
+    normalized[coerced_key] = flattened
+    return normalized
+
+
+def infer_supporting_section_key(url: str) -> str | None:
+    """Infer the canonical destination section from a supporting-page URL."""
+
+    slug = url.rstrip("/").split("/")[-1]
+    if slug == "common-issues":
+        return "common_issues"
+    if slug == "templates-and-examples":
+        return "templates_examples"
+    if "operation" in slug:
+        return "operations"
+    return None
+
+
+def flatten_supporting_sections(
+    sections: dict[str, list[str]],
+    include_heading_labels: bool,
+) -> list[str]:
+    """Flatten page-specific sections into a single canonical bucket."""
+
+    flattened: list[str] = []
+    for key, values in sections.items():
+        if key != "summary" and include_heading_labels:
+            append_once(flattened, humanize_section_key(key))
+        for value in values:
+            append_once(flattened, value)
+    return flattened
+
+
 def flush_section(sections: dict[str, list[str]], key: str, items: list[str]) -> None:
     """Persist the current section if any content was collected."""
 
@@ -147,10 +192,23 @@ def flush_section(sections: dict[str, list[str]], key: str, items: list[str]) ->
     sections.setdefault(key, []).extend(items)
 
 
+def append_once(target: list[str], value: str) -> None:
+    """Append a string once while preserving order."""
+
+    if value and value not in target:
+        target.append(value)
+
+
 def normalized_text(element: Tag) -> str:
     """Collapse whitespace from an element's text."""
 
     return " ".join(element.get_text(" ", strip=True).split())
+
+
+def humanize_section_key(value: str) -> str:
+    """Convert a normalized section key back into human-readable text."""
+
+    return value.replace("_", " ").strip().title()
 
 
 def write_extraction_report(report: ExtractionReport, output_path: Path) -> None:

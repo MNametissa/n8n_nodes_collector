@@ -8,7 +8,7 @@ from typer.testing import CliRunner
 
 from n8n_nodes_collector.cli import app
 from n8n_nodes_collector.fetch import cache_key, fetch_sources, sha256_text
-from n8n_nodes_collector.models import DiscoveryCandidate, DiscoveryReport, Family
+from n8n_nodes_collector.models import DiscoveryCandidate, DiscoveryReport, Family, SourceType
 
 
 def build_discovery_report() -> DiscoveryReport:
@@ -114,3 +114,36 @@ def test_fetch_command_writes_fetch_report(monkeypatch: object, tmp_path: Path) 
     payload = json.loads(output_path.read_text(encoding="utf-8"))
     assert len(payload["records"]) == 2
     assert payload["records"][0]["source_type"] == "index"
+
+
+def test_fetch_sources_discovers_same_node_supporting_pages(tmp_path: Path) -> None:
+    report = build_discovery_report()
+    client = make_client(
+        {
+            "https://docs.n8n.io/integrations/builtin/app-nodes/": "<html><body>library</body></html>",
+            "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/": (
+                "<html><body><article>"
+                "<h1>Google Sheets</h1>"
+                "<a href='document-operations/'>Document operations</a>"
+                "<a href='common-issues/'>Common issues</a>"
+                "</article></body></html>"
+            ),
+            "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/document-operations/": "<html><body>document ops</body></html>",
+            "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/common-issues/": "<html><body>common issues</body></html>",
+        }
+    )
+
+    fetch_report = fetch_sources(report, cache_dir=tmp_path, client=client)
+
+    supporting = [
+        record for record in fetch_report.records if record.source_type == SourceType.SUPPORTING_PAGE
+    ]
+    assert sorted(record.url for record in supporting) == [
+        "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/common-issues/",
+        "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/document-operations/",
+    ]
+    assert all(record.family == Family.ACTION for record in supporting)
+    assert all(
+        record.source_url == "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/"
+        for record in supporting
+    )

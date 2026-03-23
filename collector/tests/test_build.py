@@ -6,8 +6,8 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from n8n_nodes_collector.cli import app
-from n8n_nodes_collector.models import FetchRecord, FetchReport, Family, SourceType
-from n8n_nodes_collector.workflows import run_build
+from n8n_nodes_collector.models import DiscoveryReport, FetchRecord, FetchReport, Family, SourceType
+from n8n_nodes_collector.workflows import run_build, run_build_from_report
 
 from test_extract import FIXTURE_DIR as EXTRACT_FIXTURE_DIR
 
@@ -125,3 +125,72 @@ def test_build_command_runs_full_pipeline(monkeypatch, tmp_path: Path) -> None:
     assert "Built" in result.stdout
     assert (package_dir / "package-manifest.json").exists()
     assert (reports_dir / "normalize-report.json").exists()
+
+
+def test_run_build_from_report_writes_reports_and_package(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr("n8n_nodes_collector.workflows.fetch_sources", lambda discovery_report, cache_dir=None: build_fake_fetch_report())
+
+    discovery_report = DiscoveryReport.model_validate(
+        {
+            "source_urls": ["https://docs.n8n.io/integrations/builtin/app-nodes/"],
+            "candidates": [
+                {
+                    "url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+                    "title": "Google Sheets",
+                    "family": "action",
+                    "source_url": "https://docs.n8n.io/integrations/builtin/app-nodes/",
+                    "source_type": "node_page",
+                    "context": ["App nodes"],
+                }
+            ],
+        }
+    )
+
+    rendered_dir = run_build_from_report(
+        discovery_report,
+        package_dir=tmp_path / "package",
+        reports_dir=tmp_path / "reports",
+        cache_dir=tmp_path / "raw",
+    )
+
+    assert rendered_dir == tmp_path / "package"
+    assert (tmp_path / "reports" / "discovery-report.json").exists()
+    assert (tmp_path / "package" / "map.json").exists()
+
+
+def test_build_report_command_runs_pipeline(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr("n8n_nodes_collector.cli.run_build_from_report", lambda discovery_report, package_dir=None, reports_dir=None, cache_dir=None: tmp_path / "package")
+
+    discovery_report = {
+        "source_urls": ["https://docs.n8n.io/integrations/builtin/app-nodes/"],
+        "candidates": [
+            {
+                "url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+                "title": "Google Sheets",
+                "family": "action",
+                "source_url": "https://docs.n8n.io/integrations/builtin/app-nodes/",
+                "source_type": "node_page",
+                "context": ["App nodes"],
+            }
+        ],
+    }
+    discovery_path = tmp_path / "discovery-report.json"
+    discovery_path.write_text(json.dumps(discovery_report, indent=2) + "\n", encoding="utf-8")
+
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        [
+            "build-report",
+            str(discovery_path),
+            "--output-dir",
+            str(tmp_path / "package"),
+            "--reports-dir",
+            str(tmp_path / "reports"),
+            "--cache-dir",
+            str(tmp_path / "raw"),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "Built" in result.stdout

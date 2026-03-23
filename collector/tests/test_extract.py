@@ -49,6 +49,35 @@ def build_fetch_report() -> FetchReport:
     )
 
 
+def build_fetch_report_with_supporting_pages() -> FetchReport:
+    report = build_fetch_report()
+    report.records.extend(
+        [
+            FetchRecord(
+                url="https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/document-operations/",
+                source_type=SourceType.SUPPORTING_PAGE,
+                family=Family.ACTION,
+                source_url="https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+                http_status=200,
+                content_hash="sha256:google-doc-ops",
+                cache_path=str(FIXTURE_DIR / "google_sheets_document_operations.html"),
+                changed=True,
+            ),
+            FetchRecord(
+                url="https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/common-issues/",
+                source_type=SourceType.SUPPORTING_PAGE,
+                family=Family.ACTION,
+                source_url="https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+                http_status=200,
+                content_hash="sha256:google-common",
+                cache_path=str(FIXTURE_DIR / "google_sheets_common_issues.html"),
+                changed=True,
+            ),
+        ]
+    )
+    return report
+
+
 def test_extract_records_builds_intermediate_records() -> None:
     report = extract_records(build_fetch_report())
 
@@ -89,3 +118,16 @@ def test_extract_command_writes_json_report(tmp_path: Path) -> None:
     assert len(payload["records"]) == 3
     record = next(item for item in payload["records"] if item["display_name"] == "Google Sheets")
     assert record["section_text"]["credentials"] == ["Use Google Sheets OAuth2 credentials."]
+
+
+def test_extract_records_merge_supporting_page_sections() -> None:
+    report = extract_records(build_fetch_report_with_supporting_pages())
+
+    google = next(record for record in report.records if record.display_name == "Google Sheets")
+    assert google.supporting_pages == [
+        "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/common-issues/",
+        "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/document-operations/",
+    ]
+    assert "Append An Array" in google.section_text["common_issues"]
+    assert "Delete document" in google.section_text["operations"]
+    assert google.content_hashes["https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/common-issues/"] == "sha256:google-common"

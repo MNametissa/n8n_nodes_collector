@@ -14,7 +14,7 @@ from .models import DiscoveryReport, ExtractionReport, FetchReport, NormalizeRep
 from .normalize import normalize_records, write_normalize_report
 from .render import render_package
 from .validate import PackageValidationError, validate_package
-from .workflows import refresh_package, run_build
+from .workflows import refresh_package, run_build, run_build_from_report
 
 app = typer.Typer(help="Collector for the n8n nodes knowledge package.")
 
@@ -120,6 +120,28 @@ def build(
     """Run the full collector build workflow."""
 
     target = run_build(input_dir, package_dir=output_dir, reports_dir=reports_dir, cache_dir=cache_dir)
+    typer.echo(f"Built {target}")
+
+
+@app.command("build-report")
+def build_report(
+    discovery_report: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True),
+    output_dir: Path = typer.Option(None, "--output-dir", "-o", help="Directory to render the package into."),
+    reports_dir: Path = typer.Option(
+        None,
+        "--reports-dir",
+        help="Directory to write intermediate JSON reports into.",
+    ),
+    cache_dir: Path = typer.Option(
+        None,
+        "--cache-dir",
+        help="Directory to write raw HTML cache entries into.",
+    ),
+) -> None:
+    """Run the build workflow from a precomputed discovery report."""
+
+    report = DiscoveryReport.from_path(discovery_report)
+    target = run_build_from_report(report, package_dir=output_dir, reports_dir=reports_dir, cache_dir=cache_dir)
     typer.echo(f"Built {target}")
 
 

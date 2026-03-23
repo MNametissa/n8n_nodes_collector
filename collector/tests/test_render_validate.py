@@ -11,11 +11,12 @@ from n8n_nodes_collector.normalize import normalize_records
 from n8n_nodes_collector.render import render_package
 from n8n_nodes_collector.validate import PackageValidationError, validate_package
 
-from test_extract import build_fetch_report
+from test_extract import build_fetch_report, build_fetch_report_with_supporting_pages
 
 
-def build_normalize_report():
-    return normalize_records(extract_records(build_fetch_report()), verified_at="2026-03-23")
+def build_normalize_report(include_supporting_pages: bool = False):
+    fetch_report = build_fetch_report_with_supporting_pages() if include_supporting_pages else build_fetch_report()
+    return normalize_records(extract_records(fetch_report), verified_at="2026-03-23")
 
 
 def test_render_package_writes_required_artifacts(tmp_path: Path) -> None:
@@ -78,3 +79,33 @@ def test_render_and_validate_commands_work(tmp_path: Path) -> None:
 
     validate_result = runner.invoke(app, ["validate", str(package_dir)])
     assert validate_result.exit_code == 0
+
+
+def test_validate_package_rejects_supporting_page_outside_node_scope(tmp_path: Path) -> None:
+    package_dir = render_package(build_normalize_report(include_supporting_pages=True), output_dir=tmp_path / "package")
+    sources_path = package_dir / "sources.json"
+    sources = json.loads(sources_path.read_text(encoding="utf-8"))
+    supporting = next(source for source in sources if source["type"] == "supporting_page")
+    supporting["url"] = "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.airtable/common-issues/"
+    sources_path.write_text(json.dumps(sources, indent=2) + "\n", encoding="utf-8")
+
+    try:
+        validate_package(package_dir)
+    except PackageValidationError as exc:
+        assert "Supporting source escapes node scope" in str(exc)
+    else:
+        raise AssertionError("Expected PackageValidationError")
+
+
+def test_validate_package_rejects_markdown_identity_mismatch(tmp_path: Path) -> None:
+    package_dir = render_package(build_normalize_report(), output_dir=tmp_path / "package")
+    node_md_path = package_dir / "nodes" / "actions" / "google-sheets" / "node.md"
+    content = node_md_path.read_text(encoding="utf-8")
+    node_md_path.write_text(content.replace("`n8n.action.google-sheets`", "`n8n.action.google-sheetz`"), encoding="utf-8")
+
+    try:
+        validate_package(package_dir)
+    except PackageValidationError as exc:
+        assert "Markdown/json mismatch" in str(exc)
+    else:
+        raise AssertionError("Expected PackageValidationError")

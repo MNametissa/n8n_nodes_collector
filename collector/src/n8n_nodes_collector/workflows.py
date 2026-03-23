@@ -23,6 +23,23 @@ def run_build(
 ) -> Path:
     """Run discover, fetch, extract, normalize, render, and validate."""
 
+    discovery_report = discover_from_directory(input_dir)
+    return run_build_from_report(
+        discovery_report,
+        package_dir=package_dir,
+        reports_dir=reports_dir,
+        cache_dir=cache_dir,
+    )
+
+
+def run_build_from_report(
+    discovery_report: DiscoveryReport,
+    package_dir: Path | None = None,
+    reports_dir: Path | None = None,
+    cache_dir: Path | None = None,
+) -> Path:
+    """Run fetch, extract, normalize, render, and validate from a discovery report."""
+
     target_package_dir = package_dir or PACKAGE_DIR
     target_reports_dir = reports_dir or INTERMEDIATE_CACHE_DIR
     target_cache_dir = cache_dir or RAW_CACHE_DIR
@@ -30,7 +47,6 @@ def run_build(
     target_reports_dir.mkdir(parents=True, exist_ok=True)
     target_cache_dir.mkdir(parents=True, exist_ok=True)
 
-    discovery_report = discover_from_directory(input_dir)
     write_report_json(discovery_report.as_sorted_payload(), target_reports_dir / "discovery-report.json")
 
     fetch_report = fetch_sources(discovery_report, cache_dir=target_cache_dir)

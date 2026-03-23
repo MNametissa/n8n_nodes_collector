@@ -37,6 +37,14 @@ REQUIRED_NODE_MD_SECTIONS = [
     "## Source",
 ]
 
+EXPECTED_NODE_PREFIXES = {
+    "action": "nodes/actions/",
+    "trigger": "nodes/triggers/",
+    "core": "nodes/core/",
+    "cluster_root": "nodes/cluster/root/",
+    "cluster_sub": "nodes/cluster/sub/",
+}
+
 
 def validate_package(package_dir: Path) -> None:
     """Validate a rendered package tree."""
@@ -48,9 +56,10 @@ def validate_package(package_dir: Path) -> None:
     sources = load_json(package_dir / "sources.json")
     stats = load_json(package_dir / "stats.json")
 
-    validate_dates(manifest)
+    build_date = validate_dates(manifest)
     validate_map_entries(package_dir, map_entries)
-    validate_nodes(package_dir, map_entries, sources)
+    validate_sources(map_entries, sources)
+    validate_nodes(package_dir, map_entries, sources, build_date)
     validate_stats_and_manifest(map_entries, package_dir, stats, manifest)
     validate_map_markdown(package_dir / "map.md", stats)
     validate_indexes(package_dir / "indexes")
@@ -69,7 +78,7 @@ def load_json(path: Path):
         raise PackageValidationError(f"Invalid JSON at {path}") from exc
 
 
-def validate_dates(manifest: dict) -> None:
+def validate_dates(manifest: dict) -> date:
     today = date.today()
     build_date = parse_date(manifest["build_date"], "build_date")
     snapshot_date = parse_date(manifest["documentation_snapshot_date"], "documentation_snapshot_date")
@@ -79,6 +88,7 @@ def validate_dates(manifest: dict) -> None:
         raise PackageValidationError("documentation_snapshot_date is in the future")
     if snapshot_date > build_date:
         raise PackageValidationError("documentation_snapshot_date is newer than build_date")
+    return build_date
 
 
 def parse_date(value: str, field_name: str) -> date:
@@ -107,14 +117,40 @@ def validate_map_entries(package_dir: Path, map_entries: list[dict]) -> None:
         seen_urls.add(entry["doc_url"])
 
         for key in ("file_json", "file_md"):
+            expected_prefix = EXPECTED_NODE_PREFIXES[entry["family"]]
+            if not entry[key].startswith(expected_prefix):
+                raise PackageValidationError(f"Node path does not match family for {entry['id']}: {entry[key]}")
             target = package_dir / entry[key]
             if not target.exists():
                 raise PackageValidationError(f"Missing node file referenced by map.json: {entry[key]}")
 
 
-def validate_nodes(package_dir: Path, map_entries: list[dict], sources: list[dict]) -> None:
+def validate_sources(map_entries: list[dict], sources: list[dict]) -> None:
+    map_by_id = {entry["id"]: entry for entry in map_entries}
+    seen_sources: set[tuple[str, str]] = set()
+    for source in sources:
+        if source["node_id"] not in map_by_id:
+            raise PackageValidationError(f"Unknown source node_id: {source['node_id']}")
+        key = (source["url"], source["type"])
+        if key in seen_sources:
+            raise PackageValidationError(f"Duplicate source record: {source['url']} [{source['type']}]")
+        seen_sources.add(key)
+        if not source["content_hash"] or source["content_hash"] == "unknown":
+            raise PackageValidationError(f"Unknown source content_hash for {source['node_id']}")
+        if source["status"] == "parsed" and not source["content_hash"].startswith("sha256:"):
+            raise PackageValidationError(f"Invalid source content_hash for {source['node_id']}")
+        if source["type"] == "supporting_page":
+            doc_url = map_by_id[source["node_id"]]["doc_url"]
+            if not source["url"].startswith(f"{doc_url.rstrip('/')}/"):
+                raise PackageValidationError(f"Supporting source escapes node scope for {source['node_id']}")
+
+
+def validate_nodes(package_dir: Path, map_entries: list[dict], sources: list[dict], build_date: date) -> None:
     source_urls = {(source["url"], source["type"]) for source in sources}
     source_by_url = {source["url"]: source for source in sources}
+    sources_by_node: dict[str, list[dict]] = {}
+    for source in sources:
+        sources_by_node.setdefault(source["node_id"], []).append(source)
     for entry in map_entries:
         node_json = load_json(package_dir / entry["file_json"])
         node_md = (package_dir / entry["file_md"]).read_text(encoding="utf-8")
@@ -129,6 +165,9 @@ def validate_nodes(package_dir: Path, map_entries: list[dict], sources: list[dic
             raise PackageValidationError(f"doc_url mismatch for {entry['id']}")
         if not node_json["last_verified_at"]:
             raise PackageValidationError(f"Missing last_verified_at for {entry['id']}")
+        verified_at = parse_date(node_json["last_verified_at"], f"{entry['id']}.last_verified_at")
+        if verified_at > build_date:
+            raise PackageValidationError(f"last_verified_at is newer than build_date for {entry['id']}")
 
         validate_execution_role(node_json, entry["id"])
         validate_cluster(node_json, entry["id"])
@@ -137,6 +176,10 @@ def validate_nodes(package_dir: Path, map_entries: list[dict], sources: list[dic
             raise PackageValidationError(f"Common issues mismatch for {entry['id']}")
         if node_json["operations"] and "operations" not in node_json["source_sections_present"]:
             raise PackageValidationError(f"Operations missing from source_sections_present for {entry['id']}")
+        if node_json["common_issues"] and "common_issues" not in node_json["source_sections_present"]:
+            raise PackageValidationError(f"Common issues missing from source_sections_present for {entry['id']}")
+        if node_json["templates_examples"] and "templates_examples" not in node_json["source_sections_present"]:
+            raise PackageValidationError(f"Templates missing from source_sections_present for {entry['id']}")
         if (entry["doc_url"], "node_page") not in source_urls:
             raise PackageValidationError(f"Missing source record for {entry['id']}")
         source_record = source_by_url[entry["doc_url"]]
@@ -144,6 +187,10 @@ def validate_nodes(package_dir: Path, map_entries: list[dict], sources: list[dic
             raise PackageValidationError(f"Source status mismatch for {entry['id']}")
         if not source_record["content_hash"] or source_record["content_hash"] == "unknown":
             raise PackageValidationError(f"Unknown source content_hash for {entry['id']}")
+        if entry["has_common_issues_page"] and not has_common_issues_source(sources_by_node.get(entry["id"], [])):
+            raise PackageValidationError(f"Missing supporting common issues source for {entry['id']}")
+
+        validate_markdown_consistency(node_json, node_md)
 
         for section in REQUIRED_NODE_MD_SECTIONS:
             if section not in node_md:
@@ -198,6 +245,8 @@ def validate_stats_and_manifest(map_entries: list[dict], package_dir: Path, stat
 
     if dict(sorted(derived_by_family.items())) != stats["by_family"]:
         raise PackageValidationError("stats.json by_family mismatch")
+    if manifest["included_families"] != sorted(derived_by_family):
+        raise PackageValidationError("package-manifest.json included_families mismatch")
     if stats["with_credentials_required"] != with_credentials_required:
         raise PackageValidationError("stats.json with_credentials_required mismatch")
     if stats["with_operations_listed"] != with_operations_listed:
@@ -224,3 +273,23 @@ def validate_indexes(index_dir: Path) -> None:
             values = payload[key]
             if values != sorted(values):
                 raise PackageValidationError(f"Unsorted index values in {path.name}:{key}")
+
+
+def has_common_issues_source(node_sources: list[dict]) -> bool:
+    return any(
+        source["type"] == "supporting_page" and source["url"].endswith("/common-issues/")
+        for source in node_sources
+    )
+
+
+def validate_markdown_consistency(node_json: dict, node_md: str) -> None:
+    expected_fragments = [
+        f"- ID: `{node_json['id']}`",
+        f"- Family: `{node_json['family']}`",
+        f"- Required: `{str(node_json['credentials']['required']).lower()}`",
+        f"- URL: {node_json['doc_url']}",
+        f"- Last verified: {node_json['last_verified_at']}",
+    ]
+    for fragment in expected_fragments:
+        if fragment not in node_md:
+            raise PackageValidationError(f"Markdown/json mismatch for {node_json['id']}: {fragment}")

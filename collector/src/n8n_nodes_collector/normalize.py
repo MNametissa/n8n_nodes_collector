@@ -51,7 +51,7 @@ def normalize_records(extraction_report: ExtractionReport, verified_at: str | No
                 related_nodes=node.related_nodes,
                 requires_credentials=node.credentials.required,
                 supports_tools_connector=node.cluster.tool_connector,
-                has_common_issues_page=bool(node.common_issues),
+                has_common_issues_page=has_supporting_page(extracted, "common-issues"),
                 has_templates_section=bool(node.templates_examples),
                 status=node.status,
             )
@@ -146,6 +146,12 @@ def infer_credentials_required(extracted: ExtractedNodeRecord) -> bool:
     if extracted.family_hint == Family.ACTION:
         return bool(extracted.section_text.get("credentials"))
     return False
+
+
+def has_supporting_page(extracted: ExtractedNodeRecord, suffix: str) -> bool:
+    """Return whether the extracted node includes a supporting page with the given suffix."""
+
+    return any(page.endswith(f"/{suffix}/") for page in extracted.supporting_pages)
 
 
 def execution_role_for(family: Family) -> ExecutionRole:

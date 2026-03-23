@@ -10,11 +10,11 @@ from n8n_nodes_collector.extract import extract_records
 from n8n_nodes_collector.models import Family
 from n8n_nodes_collector.normalize import normalize_records
 
-from test_extract import build_fetch_report
+from test_extract import build_fetch_report, build_fetch_report_with_supporting_pages
 
 
 def test_normalize_records_builds_canonical_node_and_map_entries() -> None:
-    extraction_report = extract_records(build_fetch_report())
+    extraction_report = extract_records(build_fetch_report_with_supporting_pages())
     normalize_report = normalize_records(extraction_report, verified_at="2026-03-23")
 
     assert len(normalize_report.node_records) == 3
@@ -28,7 +28,7 @@ def test_normalize_records_builds_canonical_node_and_map_entries() -> None:
     assert google.family == Family.ACTION
     assert google.service == "Google Sheets"
     assert google.credentials.required is True
-    assert google.operations == ["Append row", "Read rows", "Update row"]
+    assert google.operations == ["Append row", "Read rows", "Update row", "Delete document", "Duplicate document"]
     assert google.category_path == ["actions", "google-sheets"]
     assert google.last_verified_at == "2026-03-23"
 

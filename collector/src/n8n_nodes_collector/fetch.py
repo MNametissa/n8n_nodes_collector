@@ -7,8 +7,10 @@ import json
 from pathlib import Path
 
 import httpx
+from bs4 import BeautifulSoup
 
 from .config import RAW_CACHE_DIR
+from .discovery import canonicalize_url
 from .models import DiscoveryReport, Family, FetchRecord, FetchReport, SourceType
 
 USER_AGENT = "n8n-nodes-collector/0.1.0"
@@ -33,8 +35,11 @@ def fetch_sources(
 
     try:
         report = FetchReport()
+        seen_records: set[tuple[str, SourceType]] = set()
         for url in sorted(set(discovery_report.source_urls)):
-            report.records.append(
+            append_unique_record(
+                report,
+                seen_records,
                 fetch_one(
                     url=url,
                     source_type=SourceType.INDEX,
@@ -43,16 +48,30 @@ def fetch_sources(
                 )
             )
         for candidate in sorted(discovery_report.candidates, key=lambda item: item.url):
-            report.records.append(
-                fetch_one(
-                    url=candidate.url,
-                    source_type=candidate.source_type,
-                    family=candidate.family,
-                    source_url=candidate.source_url,
-                    cache_dir=raw_cache_dir,
-                    client=http_client,
-                )
+            primary_record = fetch_one(
+                url=candidate.url,
+                source_type=candidate.source_type,
+                family=candidate.family,
+                source_url=candidate.source_url,
+                cache_dir=raw_cache_dir,
+                client=http_client,
             )
+            append_unique_record(report, seen_records, primary_record)
+            if primary_record.source_type != SourceType.NODE_PAGE:
+                continue
+            for supporting_url in discover_supporting_urls(primary_record.url, Path(primary_record.cache_path)):
+                append_unique_record(
+                    report,
+                    seen_records,
+                    fetch_one(
+                        url=supporting_url,
+                        source_type=SourceType.SUPPORTING_PAGE,
+                        family=candidate.family,
+                        source_url=primary_record.url,
+                        cache_dir=raw_cache_dir,
+                        client=http_client,
+                    ),
+                )
         return report
     finally:
         if owns_client:
@@ -100,6 +119,44 @@ def write_fetch_report(report: FetchReport, output_path: Path) -> None:
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report.as_sorted_payload(), indent=2) + "\n", encoding="utf-8")
+
+
+def append_unique_record(
+    report: FetchReport,
+    seen_records: set[tuple[str, SourceType]],
+    record: FetchRecord,
+) -> None:
+    """Append a fetch record once per URL and source type."""
+
+    key = (record.url, record.source_type)
+    if key in seen_records:
+        return
+    seen_records.add(key)
+    report.records.append(record)
+
+
+def discover_supporting_urls(node_url: str, cache_path: Path) -> list[str]:
+    """Discover same-node supporting pages from a fetched primary node page."""
+
+    soup = BeautifulSoup(cache_path.read_text(encoding="utf-8"), "lxml")
+    root = soup.find("article") or soup.find("main") or soup.body
+    if root is None:
+        return []
+
+    supporting_urls: set[str] = set()
+    supporting_prefix = f"{node_url.rstrip('/')}/"
+    for anchor in root.find_all("a", href=True):
+        href = str(anchor.get("href", "")).strip()
+        if not href:
+            continue
+        candidate_url = canonicalize_url(href, source_url=node_url)
+        if candidate_url == node_url:
+            continue
+        if not candidate_url.startswith(supporting_prefix):
+            continue
+        supporting_urls.add(candidate_url)
+
+    return sorted(supporting_urls)
 
 
 def cache_key(url: str) -> str:
