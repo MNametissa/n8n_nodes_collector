@@ -1,0 +1,4 @@
+interface:
+  display_name: "n8n Workflow Router"
+  short_description: "Route fast to the right n8n built-in node"
+  default_prompt: "Use $n8n-workflow-router to choose the best n8n node or node pair from the generated package."

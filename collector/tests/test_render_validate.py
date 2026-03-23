@@ -42,6 +42,7 @@ def test_render_package_writes_required_artifacts(tmp_path: Path) -> None:
     assert stats["nodes_total"] == 3
     assert manifest["node_count"] == 3
     assert "Specialized-First Policy" in skills
+    assert "collector resolve <package-dir>" in skills
     assert aliases["google sheets"] == ["n8n.action.google-sheets"]
     assert google["tags"]
     assert google["capabilities"]

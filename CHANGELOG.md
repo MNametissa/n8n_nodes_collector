@@ -38,3 +38,8 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - default live fetch concurrency increased to `24`
 - fallback normalization for operations and node parameters from extracted section keys
 - deterministic agent guidance generation for all normalized node families
+- dedicated install and uninstall scripts for the collector CLI
+- dedicated install and uninstall scripts for the repository-aligned routing skill in Codex and Claude Code
+- a new `n8n-workflow-router` skill aligned with `collector resolve`, package indexes, aliases, and specialized-first routing rules
+- installer tests covering real CLI venv installation and skill link installation
+- broader resolver coverage for AI task-root and provider-node routing
