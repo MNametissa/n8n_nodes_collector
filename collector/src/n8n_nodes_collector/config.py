@@ -24,6 +24,7 @@ CACHE_ROOT = REPO_ROOT / ".cache" / "n8n-nodes"
 RAW_CACHE_DIR = CACHE_ROOT / "raw"
 INTERMEDIATE_CACHE_DIR = CACHE_ROOT / "intermediate"
 PACKAGE_DIR = REPO_ROOT / "package"
+DEFAULT_FETCH_CONCURRENCY = 12
 
 LIBRARY_PATH_HINTS = {
     "app-nodes",

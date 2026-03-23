@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -9,7 +10,7 @@ from pathlib import Path
 import httpx
 from bs4 import BeautifulSoup
 
-from .config import RAW_CACHE_DIR
+from .config import DEFAULT_FETCH_CONCURRENCY, RAW_CACHE_DIR
 from .discovery import canonicalize_url
 from .models import DiscoveryReport, Family, FetchRecord, FetchReport, SourceType
 from .progress import NullProgressReporter
@@ -20,8 +21,29 @@ USER_AGENT = "n8n-nodes-collector/0.1.0"
 def fetch_sources(
     discovery_report: DiscoveryReport,
     cache_dir: Path | None = None,
-    client: httpx.Client | None = None,
+    client: httpx.AsyncClient | None = None,
     progress: object | None = None,
+    concurrency: int = DEFAULT_FETCH_CONCURRENCY,
+) -> FetchReport:
+    """Fetch and cache all URLs referenced by a discovery report."""
+
+    return asyncio.run(
+        fetch_sources_async(
+            discovery_report,
+            cache_dir=cache_dir,
+            client=client,
+            progress=progress,
+            concurrency=concurrency,
+        )
+    )
+
+
+async def fetch_sources_async(
+    discovery_report: DiscoveryReport,
+    cache_dir: Path | None = None,
+    client: httpx.AsyncClient | None = None,
+    progress: object | None = None,
+    concurrency: int = DEFAULT_FETCH_CONCURRENCY,
 ) -> FetchReport:
     """Fetch and cache all URLs referenced by a discovery report."""
 
@@ -30,77 +52,154 @@ def fetch_sources(
     reporter = progress or NullProgressReporter()
 
     owns_client = client is None
-    http_client = client or httpx.Client(
+    http_client = client or httpx.AsyncClient(
         headers={"User-Agent": USER_AGENT},
         follow_redirects=True,
         timeout=20.0,
+        limits=httpx.Limits(
+            max_connections=concurrency,
+            max_keepalive_connections=concurrency,
+        ),
     )
 
     try:
         report = FetchReport()
         seen_records: set[tuple[str, SourceType]] = set()
-        total = len(set(discovery_report.source_urls)) + len(discovery_report.candidates)
+        source_urls = sorted(set(discovery_report.source_urls))
+        candidates = sorted(discovery_report.candidates, key=lambda item: item.url)
+        total = len(source_urls) + len(candidates)
         reporter.stage("Fetch HTML sources", detail=f"{total} known URLs before supporting-page expansion")
         with reporter.task("fetch", total=total) as tracker:
-            for url in sorted(set(discovery_report.source_urls)):
+            for record in await fetch_many(
+                [
+                    FetchRequest(
+                        url=url,
+                        source_type=SourceType.INDEX,
+                    )
+                    for url in source_urls
+                ],
+                cache_dir=raw_cache_dir,
+                client=http_client,
+                tracker=tracker,
+                concurrency=concurrency,
+            ):
                 append_unique_record(
                     report,
                     seen_records,
-                    fetch_one(
-                        url=url,
-                        source_type=SourceType.INDEX,
-                        cache_dir=raw_cache_dir,
-                        client=http_client,
+                    record,
+                )
+            primary_records = await fetch_many(
+                [
+                    FetchRequest(
+                        url=candidate.url,
+                        source_type=candidate.source_type,
+                        family=candidate.family,
+                        source_url=candidate.source_url,
                     )
-                )
-                tracker.advance(item=url)
-            for candidate in sorted(discovery_report.candidates, key=lambda item: item.url):
-                primary_record = fetch_one(
-                    url=candidate.url,
-                    source_type=candidate.source_type,
-                    family=candidate.family,
-                    source_url=candidate.source_url,
-                    cache_dir=raw_cache_dir,
-                    client=http_client,
-                )
-                append_unique_record(report, seen_records, primary_record)
-                tracker.advance(item=candidate.url)
+                    for candidate in candidates
+                ],
+                cache_dir=raw_cache_dir,
+                client=http_client,
+                tracker=tracker,
+                concurrency=concurrency,
+            )
+            primary_by_url = {record.url: record for record in primary_records}
+            for record in primary_records:
+                append_unique_record(report, seen_records, record)
+            supporting_requests: list[FetchRequest] = []
+            for candidate in candidates:
+                primary_record = primary_by_url[candidate.url]
                 if primary_record.source_type != SourceType.NODE_PAGE:
                     continue
                 supporting_urls = discover_supporting_urls(primary_record.url, Path(primary_record.cache_path))
                 if supporting_urls:
                     tracker.set_total((tracker.total or 0) + len(supporting_urls))
-                for supporting_url in supporting_urls:
-                    append_unique_record(
-                        report,
-                        seen_records,
-                        fetch_one(
-                            url=supporting_url,
-                            source_type=SourceType.SUPPORTING_PAGE,
-                            family=candidate.family,
-                            source_url=primary_record.url,
-                            cache_dir=raw_cache_dir,
-                            client=http_client,
-                        ),
+                    supporting_requests.extend(
+                        [
+                            FetchRequest(
+                                url=supporting_url,
+                                source_type=SourceType.SUPPORTING_PAGE,
+                                family=candidate.family,
+                                source_url=primary_record.url,
+                            )
+                            for supporting_url in supporting_urls
+                        ]
                     )
-                    tracker.advance(item=supporting_url)
+            if supporting_requests:
+                for record in await fetch_many(
+                    supporting_requests,
+                    cache_dir=raw_cache_dir,
+                    client=http_client,
+                    tracker=tracker,
+                    concurrency=concurrency,
+                ):
+                    append_unique_record(report, seen_records, record)
         return report
     finally:
         if owns_client:
-            http_client.close()
+            await http_client.aclose()
 
 
-def fetch_one(
+class FetchRequest:
+    """Internal fetch request descriptor."""
+
+    def __init__(
+        self,
+        *,
+        url: str,
+        source_type: SourceType,
+        family: Family | None = None,
+        source_url: str | None = None,
+    ) -> None:
+        self.url = url
+        self.source_type = source_type
+        self.family = family
+        self.source_url = source_url
+
+
+async def fetch_many(
+    requests: list[FetchRequest],
+    *,
+    cache_dir: Path,
+    client: httpx.AsyncClient,
+    tracker,
+    concurrency: int,
+) -> list[FetchRecord]:
+    """Fetch many URLs concurrently while preserving deterministic output ordering."""
+
+    semaphore = asyncio.Semaphore(concurrency)
+
+    async def worker(request: FetchRequest) -> FetchRecord:
+        async with semaphore:
+            return await fetch_one_async(
+                url=request.url,
+                source_type=request.source_type,
+                cache_dir=cache_dir,
+                client=client,
+                family=request.family,
+                source_url=request.source_url,
+            )
+
+    tasks = [asyncio.create_task(worker(request)) for request in requests]
+    results: list[FetchRecord] = []
+    for task in asyncio.as_completed(tasks):
+        record = await task
+        results.append(record)
+        tracker.advance(item=record.url)
+    return sorted(results, key=lambda item: (item.source_type, item.url))
+
+
+async def fetch_one_async(
     url: str,
     source_type: SourceType,
     cache_dir: Path,
-    client: httpx.Client,
+    client: httpx.AsyncClient,
     family: Family | None = None,
     source_url: str | None = None,
 ) -> FetchRecord:
     """Fetch a single URL and write it into the raw cache."""
 
-    response = client.get(url)
+    response = await client.get(url)
     response.raise_for_status()
 
     cache_path = cache_dir / f"{cache_key(url)}.html"

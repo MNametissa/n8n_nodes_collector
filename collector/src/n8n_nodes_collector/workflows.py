@@ -23,6 +23,7 @@ def run_build(
     package_dir: Path | None = None,
     reports_dir: Path | None = None,
     cache_dir: Path | None = None,
+    fetch_concurrency: int | None = None,
 ) -> Path:
     """Run discover, fetch, extract, normalize, render, and validate."""
 
@@ -32,6 +33,7 @@ def run_build(
         package_dir=package_dir,
         reports_dir=reports_dir,
         cache_dir=cache_dir,
+        fetch_concurrency=fetch_concurrency,
     )
 
 
@@ -42,6 +44,7 @@ def run_build_from_report(
     cache_dir: Path | None = None,
     progress: object | None = None,
     snapshot_every: int | None = None,
+    fetch_concurrency: int | None = None,
 ) -> Path:
     """Run fetch, extract, normalize, render, and validate from a discovery report."""
 
@@ -55,7 +58,10 @@ def run_build_from_report(
 
     write_report_json(discovery_report.as_sorted_payload(), target_reports_dir / "discovery-report.json")
 
-    fetch_report = fetch_sources(discovery_report, cache_dir=target_cache_dir, progress=reporter)
+    fetch_kwargs = {"cache_dir": target_cache_dir, "progress": reporter}
+    if fetch_concurrency is not None:
+        fetch_kwargs["concurrency"] = fetch_concurrency
+    fetch_report = fetch_sources(discovery_report, **fetch_kwargs)
     write_fetch_report(fetch_report, target_reports_dir / "fetch-report.json")
 
     extraction_report = extract_records(fetch_report, progress=reporter)
@@ -82,6 +88,7 @@ def run_build_live(
     audit_output: Path | None = None,
     progress: object | None = None,
     snapshot_every: int = 25,
+    fetch_concurrency: int | None = None,
 ) -> tuple[Path, Path | None]:
     """Discover live official docs pages, build the package, and optionally write an audit report."""
 
@@ -95,6 +102,7 @@ def run_build_live(
         cache_dir=cache_dir,
         progress=reporter,
         snapshot_every=snapshot_every,
+        fetch_concurrency=fetch_concurrency,
     )
 
     audit_path = None

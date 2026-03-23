@@ -31,3 +31,4 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - automatic `build-live` orchestration and package readiness audits for full live corpus generation
 - terminal progress bars and stage loaders for live discovery and live build workflows
 - progressive package snapshots during `build-live`, so `map` and indexes update while normalization advances
+- bounded concurrent live fetch with configurable `--concurrency` and `--fetch-concurrency` controls

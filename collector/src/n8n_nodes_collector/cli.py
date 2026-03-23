@@ -8,6 +8,7 @@ from pathlib import Path
 import typer
 
 from .audit import audit_package, write_audit_report
+from .config import DEFAULT_FETCH_CONCURRENCY
 from .discovery import discover_from_directory, discover_from_live_sources
 from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
@@ -55,11 +56,17 @@ def fetch(
         "--cache-dir",
         help="Directory for cached raw HTML. Defaults to the configured raw cache path.",
     ),
+    concurrency: int = typer.Option(
+        DEFAULT_FETCH_CONCURRENCY,
+        "--concurrency",
+        min=1,
+        help="Maximum concurrent fetch requests.",
+    ),
 ) -> None:
     """Fetch and cache URLs from a discovery report."""
 
     report = DiscoveryReport.from_path(discovery_report)
-    fetch_report = fetch_sources(report, cache_dir=cache_dir)
+    fetch_report = fetch_sources(report, cache_dir=cache_dir, concurrency=concurrency)
     write_fetch_report(fetch_report, output)
     typer.echo(f"Wrote {output}")
 
@@ -130,10 +137,22 @@ def build(
         "--cache-dir",
         help="Directory to write raw HTML cache entries into.",
     ),
+    fetch_concurrency: int = typer.Option(
+        DEFAULT_FETCH_CONCURRENCY,
+        "--fetch-concurrency",
+        min=1,
+        help="Maximum concurrent fetch requests during the build.",
+    ),
 ) -> None:
     """Run the full collector build workflow."""
 
-    target = run_build(input_dir, package_dir=output_dir, reports_dir=reports_dir, cache_dir=cache_dir)
+    target = run_build(
+        input_dir,
+        package_dir=output_dir,
+        reports_dir=reports_dir,
+        cache_dir=cache_dir,
+        fetch_concurrency=fetch_concurrency,
+    )
     typer.echo(f"Built {target}")
 
 
@@ -151,11 +170,23 @@ def build_report(
         "--cache-dir",
         help="Directory to write raw HTML cache entries into.",
     ),
+    fetch_concurrency: int = typer.Option(
+        DEFAULT_FETCH_CONCURRENCY,
+        "--fetch-concurrency",
+        min=1,
+        help="Maximum concurrent fetch requests during the build.",
+    ),
 ) -> None:
     """Run the build workflow from a precomputed discovery report."""
 
     report = DiscoveryReport.from_path(discovery_report)
-    target = run_build_from_report(report, package_dir=output_dir, reports_dir=reports_dir, cache_dir=cache_dir)
+    target = run_build_from_report(
+        report,
+        package_dir=output_dir,
+        reports_dir=reports_dir,
+        cache_dir=cache_dir,
+        fetch_concurrency=fetch_concurrency,
+    )
     typer.echo(f"Built {target}")
 
 
@@ -182,6 +213,12 @@ def build_live(
         "--snapshot-every",
         help="Render incremental package snapshots every N normalized nodes during build-live.",
     ),
+    fetch_concurrency: int = typer.Option(
+        DEFAULT_FETCH_CONCURRENCY,
+        "--fetch-concurrency",
+        min=1,
+        help="Maximum concurrent fetch requests during the live build.",
+    ),
 ) -> None:
     """Run live discovery plus the full build workflow from official n8n docs."""
 
@@ -193,6 +230,7 @@ def build_live(
         audit_output=audit_output,
         progress=progress,
         snapshot_every=snapshot_every,
+        fetch_concurrency=fetch_concurrency,
     )
     typer.echo(f"Built {target}")
     if audit_path is not None:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import asyncio
 from pathlib import Path
 
 import httpx
@@ -25,14 +26,14 @@ def build_discovery_report() -> DiscoveryReport:
     )
 
 
-def make_client(responses: dict[str, str]) -> httpx.Client:
-    def handler(request: httpx.Request) -> httpx.Response:
+def make_client(responses: dict[str, str]) -> httpx.AsyncClient:
+    async def handler(request: httpx.Request) -> httpx.Response:
         body = responses.get(str(request.url))
         if body is None:
             return httpx.Response(status_code=404, request=request, text="not found")
         return httpx.Response(status_code=200, request=request, text=body)
 
-    return httpx.Client(transport=httpx.MockTransport(handler))
+    return httpx.AsyncClient(transport=httpx.MockTransport(handler))
 
 
 def test_fetch_sources_writes_cached_html_and_report_records(tmp_path: Path) -> None:
@@ -81,7 +82,13 @@ def test_fetch_command_writes_fetch_report(monkeypatch: object, tmp_path: Path) 
     discovery_path = tmp_path / "discovery-report.json"
     discovery_path.write_text(json.dumps(report.as_sorted_payload(), indent=2) + "\n", encoding="utf-8")
 
-    def fake_fetch_sources(discovery_report: DiscoveryReport, cache_dir: Path | None = None, client: httpx.Client | None = None):
+    def fake_fetch_sources(
+        discovery_report: DiscoveryReport,
+        cache_dir: Path | None = None,
+        client: httpx.AsyncClient | None = None,
+        progress=None,
+        concurrency: int = 12,
+    ):
         return fetch_sources(
             discovery_report,
             cache_dir=cache_dir or (tmp_path / "raw"),
@@ -91,6 +98,8 @@ def test_fetch_command_writes_fetch_report(monkeypatch: object, tmp_path: Path) 
                     "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/": "<html><body>node</body></html>",
                 }
             ),
+            progress=progress,
+            concurrency=concurrency,
         )
 
     monkeypatch.setattr("n8n_nodes_collector.cli.fetch_sources", fake_fetch_sources)
@@ -147,3 +156,33 @@ def test_fetch_sources_discovers_same_node_supporting_pages(tmp_path: Path) -> N
         record.source_url == "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/"
         for record in supporting
     )
+
+
+def test_fetch_sources_uses_concurrency_for_live_requests(tmp_path: Path) -> None:
+    report = DiscoveryReport(
+        source_urls=["https://docs.n8n.io/integrations/builtin/app-nodes/"],
+        candidates=[
+            DiscoveryCandidate(
+                url=f"https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.node{i}/",
+                title=f"Node {i}",
+                family=Family.ACTION,
+                source_url="https://docs.n8n.io/integrations/builtin/app-nodes/",
+            )
+            for i in range(6)
+        ],
+    )
+    active = 0
+    max_active = 0
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal active, max_active
+        active += 1
+        max_active = max(max_active, active)
+        await asyncio.sleep(0.01)
+        active -= 1
+        return httpx.Response(status_code=200, request=request, text="<html><body>ok</body></html>")
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    fetch_sources(report, cache_dir=tmp_path, client=client, concurrency=4)
+
+    assert max_active > 1
