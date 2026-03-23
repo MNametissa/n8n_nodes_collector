@@ -87,7 +87,7 @@ def test_fetch_command_writes_fetch_report(monkeypatch: object, tmp_path: Path) 
         cache_dir: Path | None = None,
         client: httpx.AsyncClient | None = None,
         progress=None,
-        concurrency: int = 12,
+        concurrency: int = 24,
     ):
         return fetch_sources(
             discovery_report,

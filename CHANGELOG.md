@@ -35,3 +35,4 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - aggregate `build-live` progress tracking across discover, fetch, extract, normalize, render, validate, and audit
 - stricter live extraction from docs article content, including heading cleanup and paragraph-based credentials detection
 - readiness audit thresholds for summary, operations-or-parameters, action credentials, and agent guidance coverage
+- default live fetch concurrency increased to `24`
