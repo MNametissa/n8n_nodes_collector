@@ -17,3 +17,6 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - fixture-based tests for extraction over the three sample node pages
 - working `normalize` command for canonical node and map records
 - fixture-based tests for normalization against the schema contract
+- working `render` command for canonical package artifacts under `package/`
+- working `validate` command for rendered package consistency checks
+- render/validate tests covering success paths, CLI wiring, and a validator failure case
