@@ -1,0 +1,37 @@
+[
+  {
+    "url": "https://docs.n8n.io/integrations/",
+    "title": "n8n Integrations",
+    "type": "index",
+    "collected_at": "2026-03-22",
+    "status": "referenced"
+  },
+  {
+    "url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+    "title": "Google Sheets node",
+    "type": "node_page",
+    "collected_at": "2026-03-22",
+    "status": "referenced"
+  },
+  {
+    "url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-langchain.openai/",
+    "title": "OpenAI node",
+    "type": "node_page",
+    "collected_at": "2026-03-22",
+    "status": "referenced"
+  },
+  {
+    "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/",
+    "title": "AI Agent node",
+    "type": "node_page",
+    "collected_at": "2026-03-22",
+    "status": "referenced"
+  },
+  {
+    "url": "https://docs.n8n.io/advanced-ai/langchain/langchain-n8n/",
+    "title": "LangChain concepts in n8n",
+    "type": "concept_page",
+    "collected_at": "2026-03-22",
+    "status": "referenced"
+  }
+]

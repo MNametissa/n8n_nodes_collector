@@ -1,0 +1,114 @@
+{
+  "id": "n8n.action.google-sheets",
+  "slug": "google-sheets",
+  "display_name": "Google Sheets",
+  "doc_title": "Google Sheets",
+  "family": "action",
+  "service": "Google Sheets",
+  "category_path": ["actions", "google-sheets"],
+  "doc_url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+  "source_type": "official_docs",
+  "summary": "Use Google Sheets to read, append, update, and manage spreadsheet data inside an n8n workflow.",
+  "description": "This node connects n8n workflows to Google Sheets operations. It is suited for reading spreadsheet data, writing rows, updating existing content, and using spreadsheet-backed automation patterns.",
+  "why_use_it": "Use this node when the workflow needs native Google Sheets operations instead of a generic HTTP call.",
+  "when_to_use": [
+    "when you need to read rows from a sheet",
+    "when you need to append workflow results to a spreadsheet",
+    "when you need to update structured tabular data"
+  ],
+  "when_not_to_use": [
+    "when the required Google Sheets API operation is not exposed by the node",
+    "when a completely custom Google API call is needed and must be handled through HTTP Request"
+  ],
+  "credentials": {
+    "required": true,
+    "credential_refs": ["googleSheetsOAuth2Api"],
+    "notes": "Use configured Google credentials supported by n8n."
+  },
+  "operations": [
+    "append",
+    "append or update",
+    "clear",
+    "delete",
+    "get row(s)",
+    "read",
+    "update"
+  ],
+  "node_parameters": [
+    "document selection",
+    "sheet selection",
+    "range or filter configuration",
+    "mapping between input fields and columns"
+  ],
+  "inputs": ["workflow items"],
+  "outputs": ["spreadsheet rows", "operation result items"],
+  "execution_role": {
+    "is_trigger": false,
+    "is_action": true,
+    "is_core": false,
+    "is_cluster_root": false,
+    "is_cluster_sub": false
+  },
+  "cluster": {
+    "root_or_sub": null,
+    "compatible_with": [],
+    "requires_parent": false,
+    "tool_connector": false
+  },
+  "templates_examples": [
+    "spreadsheet-backed workflow examples from the official node page"
+  ],
+  "related_resources": [
+    "official Google Sheets node page",
+    "common issues page if available",
+    "related templates"
+  ],
+  "common_issues": [
+    "authentication or permissions issues",
+    "column mapping mismatches",
+    "range or worksheet selection mistakes"
+  ],
+  "unsupported_ops_guidance": "If the needed Google Sheets API operation is unsupported by the node, consider HTTP Request with appropriate credentials and API details.",
+  "version_notes": [],
+  "tags": ["spreadsheet", "google", "tabular-data", "automation"],
+  "capabilities": ["read spreadsheet", "append rows", "update rows", "clear spreadsheet range"],
+  "limitations": [
+    "bounded by the operations exposed by the official node",
+    "custom API edge cases may require HTTP Request"
+  ],
+  "gotchas": [
+    "be careful with row matching logic during updates",
+    "confirm sheet and column mapping before bulk writes"
+  ],
+  "agent_guidance": {
+    "selection_rules": [
+      "Prefer this node when the user explicitly wants Google Sheets operations supported by n8n.",
+      "Prefer HTTP Request only when a required Sheets API operation is unavailable here."
+    ],
+    "disambiguation": [
+      "This is an action node, not a trigger.",
+      "Use this instead of generic spreadsheet phrasing when Google Sheets is explicitly named."
+    ],
+    "prompt_hints": [
+      "read from Google Sheets",
+      "append rows to sheet",
+      "update spreadsheet from workflow"
+    ],
+    "retrieval_keywords": ["google sheets", "gsheets", "spreadsheet", "append row", "update row"]
+  },
+  "related_nodes": ["n8n.action.openai"],
+  "source_sections_present": [
+    "description",
+    "credentials",
+    "operations",
+    "templates and examples",
+    "related resources",
+    "common issues"
+  ],
+  "confidence": {
+    "extraction": "medium",
+    "normalization": "medium"
+  },
+  "last_verified_at": "2026-03-22",
+  "status": "active"
+}

@@ -1,0 +1,33 @@
+{
+  "families": [
+    "core",
+    "action",
+    "trigger",
+    "cluster_root",
+    "cluster_sub"
+  ],
+  "cluster_root_groups": [
+    "agents",
+    "chains",
+    "vector_stores",
+    "misc"
+  ],
+  "cluster_sub_groups": [
+    "document_loaders",
+    "language_models",
+    "memory",
+    "output_parsers",
+    "retrievers",
+    "text_splitters",
+    "tools",
+    "embeddings",
+    "misc"
+  ],
+  "secondary_views": [
+    "service",
+    "capability",
+    "credential_requirement",
+    "ai_role",
+    "data_domain"
+  ]
+}

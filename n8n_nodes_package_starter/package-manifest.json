@@ -1,0 +1,16 @@
+{
+  "package_name": "n8n-nodes-knowledge-starter",
+  "package_version": "0.1.0",
+  "schema_version": "1.0.0",
+  "source_vendor": "n8n",
+  "source_base": "https://docs.n8n.io/",
+  "build_date": "2026-03-22",
+  "documentation_snapshot_date": "2026-03-22",
+  "coverage_status": "starter_partial",
+  "language": "fr-en-mixed",
+  "default_formats": ["markdown", "json"],
+  "taxonomy_version": "1.0.0",
+  "node_count": 3,
+  "included_families": ["action", "cluster_root"],
+  "notes": "Starter package with schemas, skills, indexes, update playbook, and 3 real node examples."
+}

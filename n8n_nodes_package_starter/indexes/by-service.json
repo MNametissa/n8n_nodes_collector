@@ -1,0 +1,5 @@
+{
+  "Google Sheets": ["n8n.action.google-sheets"],
+  "OpenAI": ["n8n.action.openai"],
+  "n8n AI": ["n8n.cluster-root.ai-agent"]
+}

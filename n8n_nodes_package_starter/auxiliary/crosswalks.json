@@ -1,0 +1,21 @@
+{
+  "specialized_vs_generic": [
+    {
+      "specialized": "n8n.action.google-sheets",
+      "generic_alternative": "n8n.core.http-request",
+      "rule": "Prefer Google Sheets for supported spreadsheet operations; use HTTP Request only for unsupported API needs."
+    },
+    {
+      "specialized": "n8n.action.openai",
+      "generic_alternative": "n8n.core.http-request",
+      "rule": "Prefer OpenAI node for supported OpenAI tasks; use HTTP Request for unsupported endpoints or advanced custom calls."
+    }
+  ],
+  "ai_relationships": [
+    {
+      "root": "n8n.cluster-root.ai-agent",
+      "related_action": "n8n.action.openai",
+      "rule": "AI Agent orchestrates an agent flow; OpenAI can provide model capabilities and may also participate in tool-enabled configurations depending on setup."
+    }
+  ]
+}

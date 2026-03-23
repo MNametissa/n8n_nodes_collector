@@ -1,0 +1,5 @@
+{
+  "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/": "n8n.action.google-sheets",
+  "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-langchain.openai/": "n8n.action.openai",
+  "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/": "n8n.cluster-root.ai-agent"
+}

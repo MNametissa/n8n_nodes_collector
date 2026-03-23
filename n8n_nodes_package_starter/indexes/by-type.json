@@ -1,0 +1,5 @@
+{
+  "spreadsheet": ["n8n.action.google-sheets"],
+  "llm_action": ["n8n.action.openai"],
+  "agent_root": ["n8n.cluster-root.ai-agent"]
+}

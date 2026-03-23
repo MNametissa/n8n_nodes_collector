@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "n8n-nodes-collector"
+version = "0.1.0"
+description = "Collector for the n8n nodes knowledge package."
+readme = "../specs/collector_build_spec.md"
+requires-python = ">=3.11"
+dependencies = [
+  "beautifulsoup4>=4.12.0",
+  "httpx>=0.27.0",
+  "lxml>=5.0.0",
+  "pydantic>=2.7.0",
+  "typer>=0.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+]
+lint = [
+  "ruff>=0.11.0",
+]
+
+[project.scripts]
+collector = "n8n_nodes_collector.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/n8n_nodes_collector"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

@@ -1,0 +1,105 @@
+{
+  "id": "n8n.cluster-root.ai-agent",
+  "slug": "ai-agent",
+  "display_name": "AI Agent",
+  "doc_title": "AI Agent node",
+  "family": "cluster_root",
+  "service": "n8n AI",
+  "category_path": ["cluster", "root", "ai-agent"],
+  "doc_url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/",
+  "source_type": "official_docs",
+  "summary": "Use AI Agent as a cluster root node to orchestrate tool-using agent behavior inside n8n AI workflows.",
+  "description": "AI Agent is a root node in n8n's cluster-node AI architecture. It coordinates agent behavior and works with connected sub-nodes such as tools and models according to the documented setup.",
+  "why_use_it": "Use this node when the workflow needs agent-style orchestration, iterative tool use, or higher-level AI task coordination.",
+  "when_to_use": [
+    "when an agent should decide how to use tools",
+    "when tool-calling is part of the workflow design",
+    "when the user needs an orchestrated AI root node rather than a simple model call"
+  ],
+  "when_not_to_use": [
+    "when a single direct model call is enough",
+    "when no tool or agent-style reasoning loop is required"
+  ],
+  "credentials": {
+    "required": true,
+    "credential_refs": ["model/tool dependent"],
+    "notes": "Credentials depend on the connected model and external tools."
+  },
+  "operations": [],
+  "node_parameters": [
+    "agent behavior settings",
+    "prompt/instruction settings",
+    "tool connectivity settings",
+    "model linkage through compatible nodes"
+  ],
+  "inputs": ["workflow items", "text prompts", "connected sub-node capabilities"],
+  "outputs": ["agent response", "tool-assisted reasoning result"],
+  "execution_role": {
+    "is_trigger": false,
+    "is_action": false,
+    "is_core": false,
+    "is_cluster_root": true,
+    "is_cluster_sub": false
+  },
+  "cluster": {
+    "root_or_sub": "root",
+    "compatible_with": ["tools", "language models", "memory", "retrievers"],
+    "requires_parent": false,
+    "tool_connector": true
+  },
+  "templates_examples": [
+    "official AI Agent templates and examples listed on the node page"
+  ],
+  "related_resources": [
+    "LangChain concepts in n8n",
+    "AI Agent common issues if available",
+    "related AI templates"
+  ],
+  "common_issues": [
+    "missing required tool connection",
+    "misunderstanding root vs sub-node architecture",
+    "confusing direct model invocation with agent orchestration"
+  ],
+  "unsupported_ops_guidance": "If the workflow does not require agent orchestration, consider a simpler AI node or a direct model-related node.",
+  "version_notes": [],
+  "tags": ["ai", "agent", "cluster-root", "tools", "orchestration"],
+  "capabilities": ["agent orchestration", "tool use", "reasoning loop"],
+  "limitations": [
+    "requires compatible connected sub-nodes for full usefulness",
+    "more complex than a direct one-step model invocation"
+  ],
+  "gotchas": [
+    "AI Agent is not the same thing as a standalone model call",
+    "cluster-node compatibility matters"
+  ],
+  "agent_guidance": {
+    "selection_rules": [
+      "Use AI Agent when the workflow needs a root node for agent-style reasoning and tool use.",
+      "Do not recommend it when a plain model call is sufficient."
+    ],
+    "disambiguation": [
+      "Different from OpenAI action node, which provides service-specific AI functionality.",
+      "Different from cluster sub-nodes, which attach capabilities to a root node rather than orchestrate the whole flow."
+    ],
+    "prompt_hints": [
+      "build an AI agent in n8n",
+      "tool-using ai workflow",
+      "agent orchestration with tools"
+    ],
+    "retrieval_keywords": ["ai agent", "agent root", "tools", "langchain", "n8n ai"]
+  },
+  "related_nodes": ["n8n.action.openai"],
+  "source_sections_present": [
+    "description",
+    "node parameters",
+    "templates and examples",
+    "related resources",
+    "common issues"
+  ],
+  "confidence": {
+    "extraction": "medium",
+    "normalization": "medium"
+  },
+  "last_verified_at": "2026-03-22",
+  "status": "active"
+}

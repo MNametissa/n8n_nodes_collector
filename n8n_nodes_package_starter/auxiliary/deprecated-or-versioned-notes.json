@@ -1,0 +1,8 @@
+{
+  "notes": [
+    {
+      "node": "n8n.action.openai",
+      "summary": "Track visible version or replacement notes from the official page."
+    }
+  ]
+}

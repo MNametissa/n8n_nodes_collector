@@ -1,0 +1,110 @@
+{
+  "id": "n8n.action.openai",
+  "slug": "openai",
+  "display_name": "OpenAI",
+  "doc_title": "OpenAI node",
+  "family": "action",
+  "service": "OpenAI",
+  "category_path": ["actions", "openai"],
+  "doc_url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-langchain.openai/",
+  "source_type": "official_docs",
+  "summary": "Use the OpenAI node for supported OpenAI-powered tasks inside n8n, including model-driven operations and tool-enabled patterns described in the official documentation.",
+  "description": "This node exposes OpenAI-related functionality through an official n8n integration. It is relevant when users want AI generation or model-connected capabilities through the built-in OpenAI node instead of generic HTTP calls.",
+  "why_use_it": "Use this node when the needed OpenAI interaction is directly supported by n8n's official node.",
+  "when_to_use": [
+    "when a workflow needs a supported OpenAI capability",
+    "when a built-in AI integration is preferable to custom API calls",
+    "when tool-enabled AI behavior fits the documented setup"
+  ],
+  "when_not_to_use": [
+    "when a required endpoint or advanced API feature is not supported by the node",
+    "when a lower-level custom call is required through HTTP Request"
+  ],
+  "credentials": {
+    "required": true,
+    "credential_refs": ["openAiApi"],
+    "notes": "Use configured OpenAI credentials supported by n8n."
+  },
+  "operations": [
+    "supported OpenAI tasks exposed by the node"
+  ],
+  "node_parameters": [
+    "model or operation-specific configuration",
+    "prompt or input settings",
+    "tool-related settings where supported"
+  ],
+  "inputs": ["workflow items", "text or structured prompt inputs"],
+  "outputs": ["model response items", "AI-generated content", "structured outputs depending on operation"],
+  "execution_role": {
+    "is_trigger": false,
+    "is_action": true,
+    "is_core": false,
+    "is_cluster_root": false,
+    "is_cluster_sub": false
+  },
+  "cluster": {
+    "root_or_sub": null,
+    "compatible_with": ["tools in supported configurations"],
+    "requires_parent": false,
+    "tool_connector": true
+  },
+  "templates_examples": [
+    "official examples and templates listed on the node page"
+  ],
+  "related_resources": [
+    "OpenAI common issues if available",
+    "related AI templates",
+    "AI documentation references"
+  ],
+  "common_issues": [
+    "credential issues",
+    "model or parameter mismatch",
+    "expecting unsupported endpoint coverage"
+  ],
+  "unsupported_ops_guidance": "If a required operation is not supported by the OpenAI node, use HTTP Request for direct API access.",
+  "version_notes": [
+    "Track visible notes about replacements or newer supported APIs from the official node page."
+  ],
+  "tags": ["ai", "llm", "openai", "generation"],
+  "capabilities": ["text generation", "AI workflow tasks", "tool-enabled AI interactions"],
+  "limitations": [
+    "limited to the operations and settings exposed by the node",
+    "advanced or newly released API features may not appear immediately"
+  ],
+  "gotchas": [
+    "users may ask for an API feature that exists in OpenAI but not in the n8n node",
+    "tool behavior and AI orchestration can overlap with cluster AI nodes"
+  ],
+  "agent_guidance": {
+    "selection_rules": [
+      "Prefer this node for supported OpenAI tasks inside n8n.",
+      "Use HTTP Request when the requested OpenAI capability is not supported by the node."
+    ],
+    "disambiguation": [
+      "Do not confuse this action node with OpenAI-related cluster sub-nodes such as chat model nodes.",
+      "This node is different from AI Agent; AI Agent orchestrates agent behavior while this node provides OpenAI-specific functionality."
+    ],
+    "prompt_hints": [
+      "use openai in n8n",
+      "generate text with openai",
+      "call supported openai operation"
+    ],
+    "retrieval_keywords": ["openai", "ai generation", "llm", "responses", "tools"]
+  },
+  "related_nodes": ["n8n.cluster-root.ai-agent"],
+  "source_sections_present": [
+    "description",
+    "credentials",
+    "operations or task coverage",
+    "templates and examples",
+    "related resources",
+    "common issues",
+    "version notes"
+  ],
+  "confidence": {
+    "extraction": "medium",
+    "normalization": "medium"
+  },
+  "last_verified_at": "2026-03-22",
+  "status": "active"
+}

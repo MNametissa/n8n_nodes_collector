@@ -1,0 +1,7 @@
+{
+  "append rows": ["n8n.action.google-sheets"],
+  "update spreadsheet rows": ["n8n.action.google-sheets"],
+  "text generation": ["n8n.action.openai"],
+  "tool-enabled AI interactions": ["n8n.action.openai"],
+  "agent orchestration": ["n8n.cluster-root.ai-agent"]
+}

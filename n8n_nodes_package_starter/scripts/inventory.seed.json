@@ -1,0 +1,11 @@
+{
+  "source": "manual_seed",
+  "urls": [
+    "https://docs.n8n.io/integrations/",
+    "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+    "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-langchain.openai/",
+    "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/",
+    "https://docs.n8n.io/advanced-ai/langchain/langchain-n8n/"
+  ],
+  "note": "Replace this seed with a collector that discovers all official node pages."
+}

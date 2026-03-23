@@ -1,0 +1,11 @@
+{
+  "nodes_total": 3,
+  "by_family": {
+    "action": 2,
+    "cluster_root": 1
+  },
+  "with_credentials_required": 3,
+  "with_operations_listed": 2,
+  "with_agent_guidance": 3,
+  "coverage_status": "starter_partial"
+}

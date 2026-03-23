@@ -1,0 +1,91 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from typer.testing import CliRunner
+
+from n8n_nodes_collector.cli import app
+from n8n_nodes_collector.extract import extract_records
+from n8n_nodes_collector.models import ExtractedNodeRecord, Family, FetchRecord, FetchReport, SourceType
+
+FIXTURE_DIR = Path(__file__).parent / "fixtures" / "extract"
+
+
+def build_fetch_report() -> FetchReport:
+    return FetchReport(
+        records=[
+            FetchRecord(
+                url="https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+                source_type=SourceType.NODE_PAGE,
+                family=Family.ACTION,
+                source_url="https://docs.n8n.io/integrations/builtin/app-nodes/",
+                http_status=200,
+                content_hash="sha256:google",
+                cache_path=str(FIXTURE_DIR / "google_sheets_node.html"),
+                changed=True,
+            ),
+            FetchRecord(
+                url="https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/",
+                source_type=SourceType.NODE_PAGE,
+                family=Family.CLUSTER_ROOT,
+                source_url="https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/",
+                http_status=200,
+                content_hash="sha256:agent",
+                cache_path=str(FIXTURE_DIR / "ai_agent_node.html"),
+                changed=True,
+            ),
+            FetchRecord(
+                url="https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger/",
+                source_type=SourceType.NODE_PAGE,
+                family=Family.TRIGGER,
+                source_url="https://docs.n8n.io/integrations/builtin/trigger-nodes/",
+                http_status=200,
+                content_hash="sha256:schedule",
+                cache_path=str(FIXTURE_DIR / "schedule_trigger_node.html"),
+                changed=True,
+            ),
+        ]
+    )
+
+
+def test_extract_records_builds_intermediate_records() -> None:
+    report = extract_records(build_fetch_report())
+
+    assert len(report.records) == 3
+    by_name = {record.display_name: record for record in report.records}
+    assert isinstance(by_name["Google Sheets"], ExtractedNodeRecord)
+    assert by_name["Google Sheets"].family_hint == Family.ACTION
+    assert by_name["Google Sheets"].section_text["summary"] == [
+        "Use Google Sheets to work with spreadsheet data inside n8n workflows."
+    ]
+    assert by_name["Google Sheets"].section_text["operations"] == [
+        "Append row",
+        "Read rows",
+        "Update row",
+    ]
+    assert by_name["AI Agent"].section_text["node_parameters"] == [
+        "Prompt",
+        "System instructions",
+        "Tool connections",
+    ]
+    assert by_name["Schedule Trigger"].family_hint == Family.TRIGGER
+    assert by_name["Schedule Trigger"].section_text["templates_examples"] == [
+        "Scheduled workflow templates"
+    ]
+
+
+def test_extract_command_writes_json_report(tmp_path: Path) -> None:
+    fetch_report = build_fetch_report()
+    fetch_path = tmp_path / "fetch-report.json"
+    fetch_path.write_text(json.dumps(fetch_report.as_sorted_payload(), indent=2) + "\n", encoding="utf-8")
+
+    runner = CliRunner()
+    output_path = tmp_path / "extract-report.json"
+    result = runner.invoke(app, ["extract", str(fetch_path), "--output", str(output_path)])
+
+    assert result.exit_code == 0
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert len(payload["records"]) == 3
+    record = next(item for item in payload["records"] if item["display_name"] == "Google Sheets")
+    assert record["section_text"]["credentials"] == ["Use Google Sheets OAuth2 credentials."]
