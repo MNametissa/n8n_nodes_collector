@@ -15,6 +15,7 @@ from .models import (
     FetchReport,
     SourceType,
 )
+from .progress import NullProgressReporter
 
 HEADING_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6"}
 PRIMARY_SECTION_ALIASES = {
@@ -32,9 +33,10 @@ PRIMARY_SECTION_ALIASES = {
 }
 
 
-def extract_records(fetch_report: FetchReport) -> ExtractionReport:
+def extract_records(fetch_report: FetchReport, progress: object | None = None) -> ExtractionReport:
     """Extract intermediate records from cached node HTML."""
 
+    reporter = progress or NullProgressReporter()
     grouped: dict[str, list[FetchRecord]] = defaultdict(list)
     for record in fetch_report.records:
         if record.source_type not in {SourceType.NODE_PAGE, SourceType.SUPPORTING_PAGE}:
@@ -43,12 +45,16 @@ def extract_records(fetch_report: FetchReport) -> ExtractionReport:
         grouped[node_key].append(record)
 
     extracted: list[ExtractedNodeRecord] = []
-    for node_url in sorted(grouped):
-        records = sorted(grouped[node_url], key=lambda item: (item.source_type, item.url))
-        primary = next((record for record in records if record.source_type == SourceType.NODE_PAGE), None)
-        if primary is None:
-            continue
-        extracted.append(extract_node_group(node_url=node_url, primary=primary, related_records=records))
+    node_urls = sorted(grouped)
+    reporter.stage("Extract node records", detail=f"{len(node_urls)} grouped nodes")
+    with reporter.task("extract", total=len(node_urls)) as tracker:
+        for node_url in node_urls:
+            records = sorted(grouped[node_url], key=lambda item: (item.source_type, item.url))
+            primary = next((record for record in records if record.source_type == SourceType.NODE_PAGE), None)
+            if primary is None:
+                continue
+            extracted.append(extract_node_group(node_url=node_url, primary=primary, related_records=records))
+            tracker.advance(item=node_url)
 
     return ExtractionReport(records=extracted)
 

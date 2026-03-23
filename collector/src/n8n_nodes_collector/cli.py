@@ -13,6 +13,7 @@ from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
 from .models import DiscoveryReport, ExtractionReport, FetchReport, NormalizeReport
 from .normalize import normalize_records, write_normalize_report
+from .progress import TerminalProgressReporter
 from .render import render_package
 from .validate import PackageValidationError, validate_package
 from .workflows import refresh_package, run_build, run_build_from_report, run_build_live
@@ -39,7 +40,7 @@ def discover_live(
 ) -> None:
     """Discover built-in node pages from the official live n8n docs navigation."""
 
-    report = discover_from_live_sources()
+    report = discover_from_live_sources(progress=TerminalProgressReporter(force=True))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report.as_sorted_payload(), indent=2) + "\n", encoding="utf-8")
     typer.echo(f"Wrote {output}")
@@ -179,11 +180,13 @@ def build_live(
 ) -> None:
     """Run live discovery plus the full build workflow from official n8n docs."""
 
+    progress = TerminalProgressReporter(force=True)
     target, audit_path = run_build_live(
         package_dir=output_dir,
         reports_dir=reports_dir,
         cache_dir=cache_dir,
         audit_output=audit_output,
+        progress=progress,
     )
     typer.echo(f"Built {target}")
     if audit_path is not None:

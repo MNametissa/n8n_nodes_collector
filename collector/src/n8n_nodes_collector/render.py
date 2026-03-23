@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .config import PACKAGE_DIR
 from .models import CanonicalNodeRecord, Family, NormalizeReport
+from .progress import NullProgressReporter
 
 ROOT_JSON_FILES = {
     "package-manifest.json",
@@ -23,10 +24,12 @@ def render_package(
     normalize_report: NormalizeReport,
     output_dir: Path | None = None,
     package_version: str = "0.1.0",
+    progress: object | None = None,
 ) -> Path:
     """Render a canonical package tree."""
 
     target = output_dir or PACKAGE_DIR
+    reporter = progress or NullProgressReporter()
     target.mkdir(parents=True, exist_ok=True)
     (target / "indexes").mkdir(exist_ok=True)
     (target / "auxiliary").mkdir(exist_ok=True)
@@ -54,7 +57,8 @@ def render_package(
     write_json(target / "stats.json", build_stats(normalize_report.node_records))
     render_indexes(normalize_report, target / "indexes")
     render_auxiliary(target / "auxiliary")
-    render_nodes(normalize_report.node_records, target)
+    reporter.stage("Render package", detail=f"{len(normalize_report.node_records)} node artifacts")
+    render_nodes(normalize_report.node_records, target, progress=reporter)
     return target
 
 
@@ -162,12 +166,15 @@ def render_auxiliary(auxiliary_dir: Path) -> None:
     write_json(auxiliary_dir / "deprecated-or-versioned-notes.json", [])
 
 
-def render_nodes(node_records: list[CanonicalNodeRecord], output_dir: Path) -> None:
-    for record in node_records:
-        node_dir = output_dir / node_folder(record.family, record.slug)
-        node_dir.mkdir(parents=True, exist_ok=True)
-        write_json(node_dir / "node.json", record.model_dump(mode="json"))
-        write_text(node_dir / "node.md", render_node_markdown(record))
+def render_nodes(node_records: list[CanonicalNodeRecord], output_dir: Path, progress: object | None = None) -> None:
+    reporter = progress or NullProgressReporter()
+    with reporter.task("render", total=len(node_records)) as tracker:
+        for record in node_records:
+            node_dir = output_dir / node_folder(record.family, record.slug)
+            node_dir.mkdir(parents=True, exist_ok=True)
+            write_json(node_dir / "node.json", record.model_dump(mode="json"))
+            write_text(node_dir / "node.md", render_node_markdown(record))
+            tracker.advance(item=record.id)
 
 
 def node_folder(family: Family, slug: str) -> str:

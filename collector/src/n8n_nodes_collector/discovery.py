@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup, Tag
 
 from .config import BUILTIN_PREFIX, DISCOVERY_LIBRARY_URLS, LIBRARY_PATH_HINTS, OFFICIAL_DOCS_BASE
 from .models import DiscoveryCandidate, DiscoveryReport, Family
+from .progress import NullProgressReporter
 
 HEADING_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6"}
 
@@ -36,20 +37,26 @@ def discover_from_directory(html_dir: Path) -> DiscoveryReport:
 def discover_from_live_sources(
     source_urls: list[str] | None = None,
     client: httpx.Client | None = None,
+    progress: object | None = None,
 ) -> DiscoveryReport:
     """Discover built-in node candidates from official live library pages."""
 
     library_urls = source_urls or DISCOVERY_LIBRARY_URLS
     owns_client = client is None
     http_client = client or httpx.Client(follow_redirects=True, timeout=20.0)
+    reporter = progress or NullProgressReporter()
 
     try:
         report = DiscoveryReport()
-        for source_url in library_urls:
-            response = http_client.get(source_url)
-            response.raise_for_status()
-            report.source_urls.append(str(response.url))
-            report.candidates.extend(discover_from_navigation_html(response.text, source_url=str(response.url)))
+        reporter.stage("Discover live libraries", detail=f"{len(library_urls)} source pages")
+        with reporter.task("discover", total=len(library_urls)) as tracker:
+            for source_url in library_urls:
+                response = http_client.get(source_url)
+                response.raise_for_status()
+                resolved_url = str(response.url)
+                report.source_urls.append(resolved_url)
+                report.candidates.extend(discover_from_navigation_html(response.text, source_url=resolved_url))
+                tracker.advance(item=resolved_url)
         report.candidates = dedupe_candidates(report.candidates)
         report.source_urls = sorted(set(report.source_urls))
         return report

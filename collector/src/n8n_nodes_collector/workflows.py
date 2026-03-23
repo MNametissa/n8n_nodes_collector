@@ -12,6 +12,7 @@ from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
 from .models import DiscoveryReport, FetchReport
 from .normalize import normalize_records, write_normalize_report
+from .progress import NullProgressReporter
 from .render import render_package
 from .validate import validate_package
 
@@ -38,28 +39,31 @@ def run_build_from_report(
     package_dir: Path | None = None,
     reports_dir: Path | None = None,
     cache_dir: Path | None = None,
+    progress: object | None = None,
 ) -> Path:
     """Run fetch, extract, normalize, render, and validate from a discovery report."""
 
     target_package_dir = package_dir or PACKAGE_DIR
     target_reports_dir = reports_dir or INTERMEDIATE_CACHE_DIR
     target_cache_dir = cache_dir or RAW_CACHE_DIR
+    reporter = progress or NullProgressReporter()
 
     target_reports_dir.mkdir(parents=True, exist_ok=True)
     target_cache_dir.mkdir(parents=True, exist_ok=True)
 
     write_report_json(discovery_report.as_sorted_payload(), target_reports_dir / "discovery-report.json")
 
-    fetch_report = fetch_sources(discovery_report, cache_dir=target_cache_dir)
+    fetch_report = fetch_sources(discovery_report, cache_dir=target_cache_dir, progress=reporter)
     write_fetch_report(fetch_report, target_reports_dir / "fetch-report.json")
 
-    extraction_report = extract_records(fetch_report)
+    extraction_report = extract_records(fetch_report, progress=reporter)
     write_extraction_report(extraction_report, target_reports_dir / "extract-report.json")
 
-    normalize_report = normalize_records(extraction_report)
+    normalize_report = normalize_records(extraction_report, progress=reporter)
     write_normalize_report(normalize_report, target_reports_dir / "normalize-report.json")
 
-    rendered_dir = render_package(normalize_report, output_dir=target_package_dir)
+    rendered_dir = render_package(normalize_report, output_dir=target_package_dir, progress=reporter)
+    reporter.stage("Validate package", detail=str(rendered_dir))
     validate_package(rendered_dir)
     return rendered_dir
 
@@ -69,20 +73,24 @@ def run_build_live(
     reports_dir: Path | None = None,
     cache_dir: Path | None = None,
     audit_output: Path | None = None,
+    progress: object | None = None,
 ) -> tuple[Path, Path | None]:
     """Discover live official docs pages, build the package, and optionally write an audit report."""
 
     target_reports_dir = reports_dir or INTERMEDIATE_CACHE_DIR
-    discovery_report = discover_from_live_sources()
+    reporter = progress or NullProgressReporter()
+    discovery_report = discover_from_live_sources(progress=reporter)
     rendered_dir = run_build_from_report(
         discovery_report,
         package_dir=package_dir,
         reports_dir=target_reports_dir,
         cache_dir=cache_dir,
+        progress=reporter,
     )
 
     audit_path = None
     if audit_output is not None:
+        reporter.stage("Audit package", detail=str(rendered_dir))
         audit_report = audit_package(rendered_dir, discovery_report=discovery_report)
         write_audit_report(audit_report, audit_output)
         audit_path = audit_output

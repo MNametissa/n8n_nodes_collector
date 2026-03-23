@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from .config import RAW_CACHE_DIR
 from .discovery import canonicalize_url
 from .models import DiscoveryReport, Family, FetchRecord, FetchReport, SourceType
+from .progress import NullProgressReporter
 
 USER_AGENT = "n8n-nodes-collector/0.1.0"
 
@@ -20,11 +21,13 @@ def fetch_sources(
     discovery_report: DiscoveryReport,
     cache_dir: Path | None = None,
     client: httpx.Client | None = None,
+    progress: object | None = None,
 ) -> FetchReport:
     """Fetch and cache all URLs referenced by a discovery report."""
 
     raw_cache_dir = cache_dir or RAW_CACHE_DIR
     raw_cache_dir.mkdir(parents=True, exist_ok=True)
+    reporter = progress or NullProgressReporter()
 
     owns_client = client is None
     http_client = client or httpx.Client(
@@ -36,42 +39,51 @@ def fetch_sources(
     try:
         report = FetchReport()
         seen_records: set[tuple[str, SourceType]] = set()
-        for url in sorted(set(discovery_report.source_urls)):
-            append_unique_record(
-                report,
-                seen_records,
-                fetch_one(
-                    url=url,
-                    source_type=SourceType.INDEX,
-                    cache_dir=raw_cache_dir,
-                    client=http_client,
-                )
-            )
-        for candidate in sorted(discovery_report.candidates, key=lambda item: item.url):
-            primary_record = fetch_one(
-                url=candidate.url,
-                source_type=candidate.source_type,
-                family=candidate.family,
-                source_url=candidate.source_url,
-                cache_dir=raw_cache_dir,
-                client=http_client,
-            )
-            append_unique_record(report, seen_records, primary_record)
-            if primary_record.source_type != SourceType.NODE_PAGE:
-                continue
-            for supporting_url in discover_supporting_urls(primary_record.url, Path(primary_record.cache_path)):
+        total = len(set(discovery_report.source_urls)) + len(discovery_report.candidates)
+        reporter.stage("Fetch HTML sources", detail=f"{total} known URLs before supporting-page expansion")
+        with reporter.task("fetch", total=total) as tracker:
+            for url in sorted(set(discovery_report.source_urls)):
                 append_unique_record(
                     report,
                     seen_records,
                     fetch_one(
-                        url=supporting_url,
-                        source_type=SourceType.SUPPORTING_PAGE,
-                        family=candidate.family,
-                        source_url=primary_record.url,
+                        url=url,
+                        source_type=SourceType.INDEX,
                         cache_dir=raw_cache_dir,
                         client=http_client,
-                    ),
+                    )
                 )
+                tracker.advance(item=url)
+            for candidate in sorted(discovery_report.candidates, key=lambda item: item.url):
+                primary_record = fetch_one(
+                    url=candidate.url,
+                    source_type=candidate.source_type,
+                    family=candidate.family,
+                    source_url=candidate.source_url,
+                    cache_dir=raw_cache_dir,
+                    client=http_client,
+                )
+                append_unique_record(report, seen_records, primary_record)
+                tracker.advance(item=candidate.url)
+                if primary_record.source_type != SourceType.NODE_PAGE:
+                    continue
+                supporting_urls = discover_supporting_urls(primary_record.url, Path(primary_record.cache_path))
+                if supporting_urls:
+                    tracker.set_total((tracker.total or 0) + len(supporting_urls))
+                for supporting_url in supporting_urls:
+                    append_unique_record(
+                        report,
+                        seen_records,
+                        fetch_one(
+                            url=supporting_url,
+                            source_type=SourceType.SUPPORTING_PAGE,
+                            family=candidate.family,
+                            source_url=primary_record.url,
+                            cache_dir=raw_cache_dir,
+                            client=http_client,
+                        ),
+                    )
+                    tracker.advance(item=supporting_url)
         return report
     finally:
         if owns_client:

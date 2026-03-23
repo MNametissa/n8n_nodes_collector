@@ -130,7 +130,7 @@ def test_discover_from_live_sources_uses_active_navigation_branch_only() -> None
 
 def test_discover_live_command_writes_json_report(monkeypatch: object, tmp_path: Path) -> None:
     expected = discover_from_directory(FIXTURE_DIR)
-    monkeypatch.setattr("n8n_nodes_collector.cli.discover_from_live_sources", lambda: expected)
+    monkeypatch.setattr("n8n_nodes_collector.cli.discover_from_live_sources", lambda progress=None: expected)
 
     runner = CliRunner()
     output_path = tmp_path / "discovery-live-report.json"

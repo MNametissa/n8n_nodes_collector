@@ -21,41 +21,51 @@ from .models import (
     NormalizeReport,
     SourceType,
 )
+from .progress import NullProgressReporter
 
 
-def normalize_records(extraction_report: ExtractionReport, verified_at: str | None = None) -> NormalizeReport:
+def normalize_records(
+    extraction_report: ExtractionReport,
+    verified_at: str | None = None,
+    progress: object | None = None,
+) -> NormalizeReport:
     """Normalize extracted records into canonical node and map outputs."""
 
     normalized_date = verified_at or date.today().isoformat()
     node_records: list[CanonicalNodeRecord] = []
     map_entries: list[CanonicalMapEntry] = []
     source_records: list[CanonicalSourceRecord] = []
+    reporter = progress or NullProgressReporter()
 
-    for extracted in sorted(extraction_report.records, key=lambda item: (item.family_hint, item.node_url)):
-        node = normalize_node_record(extracted, verified_at=normalized_date)
-        node_records.append(node)
-        source_records.extend(normalize_source_records(extracted, node))
-        map_entries.append(
-            CanonicalMapEntry(
-                id=node.id,
-                slug=node.slug,
-                display_name=node.display_name,
-                family=node.family,
-                category_path=node.category_path,
-                service=node.service,
-                doc_url=node.doc_url,
-                file_md=f"{node_folder(node.family, node.slug)}/node.md",
-                file_json=f"{node_folder(node.family, node.slug)}/node.json",
-                tags=node.tags,
-                capabilities=node.capabilities,
-                related_nodes=node.related_nodes,
-                requires_credentials=node.credentials.required,
-                supports_tools_connector=node.cluster.tool_connector,
-                has_common_issues_page=has_supporting_page(extracted, "common-issues"),
-                has_templates_section=bool(node.templates_examples),
-                status=node.status,
+    records = sorted(extraction_report.records, key=lambda item: (item.family_hint, item.node_url))
+    reporter.stage("Normalize node records", detail=f"{len(records)} extracted nodes")
+    with reporter.task("normalize", total=len(records)) as tracker:
+        for extracted in records:
+            node = normalize_node_record(extracted, verified_at=normalized_date)
+            node_records.append(node)
+            source_records.extend(normalize_source_records(extracted, node))
+            map_entries.append(
+                CanonicalMapEntry(
+                    id=node.id,
+                    slug=node.slug,
+                    display_name=node.display_name,
+                    family=node.family,
+                    category_path=node.category_path,
+                    service=node.service,
+                    doc_url=node.doc_url,
+                    file_md=f"{node_folder(node.family, node.slug)}/node.md",
+                    file_json=f"{node_folder(node.family, node.slug)}/node.json",
+                    tags=node.tags,
+                    capabilities=node.capabilities,
+                    related_nodes=node.related_nodes,
+                    requires_credentials=node.credentials.required,
+                    supports_tools_connector=node.cluster.tool_connector,
+                    has_common_issues_page=has_supporting_page(extracted, "common-issues"),
+                    has_templates_section=bool(node.templates_examples),
+                    status=node.status,
+                )
             )
-        )
+            tracker.advance(item=node.id)
 
     return NormalizeReport(
         map_entries=map_entries,

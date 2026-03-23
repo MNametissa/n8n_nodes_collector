@@ -29,3 +29,4 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - stricter validation for family/path consistency, source scope, source hash format, markdown identity, and node verification dates
 - live navigation-based discovery for official library pages, plus an explicit live network test path
 - automatic `build-live` orchestration and package readiness audits for full live corpus generation
+- terminal progress bars and stage loaders for live discovery and live build workflows

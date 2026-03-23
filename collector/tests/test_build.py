@@ -76,7 +76,10 @@ def build_fake_fetch_report() -> FetchReport:
 
 
 def test_run_build_writes_reports_and_package(monkeypatch, tmp_path: Path) -> None:
-    monkeypatch.setattr("n8n_nodes_collector.workflows.fetch_sources", lambda discovery_report, cache_dir=None: build_fake_fetch_report())
+    monkeypatch.setattr(
+        "n8n_nodes_collector.workflows.fetch_sources",
+        lambda discovery_report, cache_dir=None, progress=None: build_fake_fetch_report(),
+    )
 
     reports_dir = tmp_path / "reports"
     package_dir = tmp_path / "package"
@@ -101,7 +104,10 @@ def test_run_build_writes_reports_and_package(monkeypatch, tmp_path: Path) -> No
 
 
 def test_build_command_runs_full_pipeline(monkeypatch, tmp_path: Path) -> None:
-    monkeypatch.setattr("n8n_nodes_collector.workflows.fetch_sources", lambda discovery_report, cache_dir=None: build_fake_fetch_report())
+    monkeypatch.setattr(
+        "n8n_nodes_collector.workflows.fetch_sources",
+        lambda discovery_report, cache_dir=None, progress=None: build_fake_fetch_report(),
+    )
 
     runner = CliRunner()
     package_dir = tmp_path / "package"
@@ -128,7 +134,10 @@ def test_build_command_runs_full_pipeline(monkeypatch, tmp_path: Path) -> None:
 
 
 def test_run_build_from_report_writes_reports_and_package(monkeypatch, tmp_path: Path) -> None:
-    monkeypatch.setattr("n8n_nodes_collector.workflows.fetch_sources", lambda discovery_report, cache_dir=None: build_fake_fetch_report())
+    monkeypatch.setattr(
+        "n8n_nodes_collector.workflows.fetch_sources",
+        lambda discovery_report, cache_dir=None, progress=None: build_fake_fetch_report(),
+    )
 
     discovery_report = DiscoveryReport.model_validate(
         {
@@ -214,10 +223,13 @@ def test_run_build_live_runs_discovery_build_and_audit(monkeypatch, tmp_path: Pa
     )
     expected_package = tmp_path / "package"
 
-    monkeypatch.setattr("n8n_nodes_collector.workflows.discover_from_live_sources", lambda: discovery_report)
+    monkeypatch.setattr(
+        "n8n_nodes_collector.workflows.discover_from_live_sources",
+        lambda progress=None: discovery_report,
+    )
     monkeypatch.setattr(
         "n8n_nodes_collector.workflows.run_build_from_report",
-        lambda report, package_dir=None, reports_dir=None, cache_dir=None: expected_package,
+        lambda report, package_dir=None, reports_dir=None, cache_dir=None, progress=None: expected_package,
     )
     monkeypatch.setattr(
         "n8n_nodes_collector.workflows.audit_package",
@@ -238,6 +250,7 @@ def test_run_build_live_runs_discovery_build_and_audit(monkeypatch, tmp_path: Pa
         reports_dir=tmp_path / "reports",
         cache_dir=tmp_path / "raw",
         audit_output=tmp_path / "audit.json",
+        progress=None,
     )
 
     assert rendered_dir == expected_package
