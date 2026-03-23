@@ -188,3 +188,54 @@ def test_extract_records_prefers_article_root_and_paragraph_headings(tmp_path: P
         "Attendance Create Get Get All",
         "Person Update",
     ]
+
+
+def test_extract_records_ignores_widgets_and_parses_admonition_sections(tmp_path: Path) -> None:
+    html = """\
+<html>
+  <body>
+    <article class="md-content__inner md-typeset">
+      <a class="md-content__button md-icon"></a>
+      <h1>OpenRouter Chat Model node #</h1>
+      <p>Use the OpenRouter Chat Model node to use OpenRouter's chat models with conversational agents.</p>
+      <p>On this page, you'll find the node parameters for the OpenRouter Chat Model node.</p>
+      <div class="admonition note">
+        <p>Credentials</p>
+        <p>You can find authentication information for this node here.</p>
+      </div>
+      <h2>Node parameters #</h2>
+      <h3>Model #</h3>
+      <p>Select the model to use.</p>
+      <div class="n8n-wrap-kapa">Chat with the docs</div>
+      <div class="n8n-feedback-container">Helpful Not helpful</div>
+    </article>
+  </body>
+</html>
+"""
+    cache_path = tmp_path / "openrouter-chat-model.html"
+    cache_path.write_text(html, encoding="utf-8")
+    fetch_report = FetchReport(
+        records=[
+            FetchRecord(
+                url="https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.lmchatopenrouter/",
+                source_type=SourceType.NODE_PAGE,
+                family=Family.CLUSTER_SUB,
+                source_url="https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/",
+                http_status=200,
+                content_hash="sha256:test",
+                cache_path=str(cache_path),
+                changed=True,
+            )
+        ]
+    )
+
+    report = extract_records(fetch_report)
+    record = report.records[0]
+
+    assert record.section_text["summary"] == [
+        "Use the OpenRouter Chat Model node to use OpenRouter's chat models with conversational agents.",
+        "On this page, you'll find the node parameters for the OpenRouter Chat Model node.",
+    ]
+    assert record.section_text["credentials"] == ["You can find authentication information for this node here"]
+    assert record.section_text["model"] == ["Select the model to use."]
+    assert "Chat with the docs" not in " ".join(record.section_text["summary"])

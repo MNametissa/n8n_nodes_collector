@@ -32,6 +32,11 @@ PRIMARY_SECTION_ALIASES = {
     "inputs": "inputs",
     "outputs": "outputs",
 }
+IGNORED_ROOT_CLASSES = {
+    "md-content__button",
+    "n8n-wrap-kapa",
+    "n8n-feedback-container",
+}
 
 
 def extract_records(fetch_report: FetchReport, progress: object | None = None) -> ExtractionReport:
@@ -104,25 +109,34 @@ def extract_sections(html: str) -> tuple[str, dict[str, list[str]]]:
     current_key = "summary"
     current_items: list[str] = []
 
-    for element in root.descendants:
-        if not isinstance(element, Tag):
+    for child in root.children:
+        if not isinstance(child, Tag):
             continue
-        if element.name == "h1":
+        if should_skip_root_child(child):
             continue
-        if element.name in {"h2", "h3", "h4", "h5", "h6"}:
+        if child.name == "h1":
+            continue
+        if child.name in {"h2", "h3", "h4", "h5", "h6"}:
             flush_section(sections, current_key, current_items)
-            current_key = normalize_section_name(normalized_text(element))
+            current_key = normalize_section_name(normalized_text(child))
             current_items = []
             continue
-        if element.name == "p" and is_heading_like_paragraph(element):
+        if child.name == "p" and is_heading_like_paragraph(child):
             flush_section(sections, current_key, current_items)
-            current_key = normalize_section_name(normalized_text(element))
+            current_key = normalize_section_name(normalized_text(child))
             current_items = []
             continue
-        if element.name in {"p", "li"}:
-            text = normalized_text(element)
-            if text:
-                current_items.append(text)
+
+        admonition = parse_admonition_section(child)
+        if admonition is not None:
+            flush_section(sections, current_key, current_items)
+            admonition_key, admonition_items = admonition
+            merge_section_text(sections, {admonition_key: admonition_items})
+            current_key = admonition_key
+            current_items = []
+            continue
+
+        append_child_content(current_items, child)
 
     flush_section(sections, current_key, current_items)
     return title, sections
@@ -154,6 +168,75 @@ def is_heading_like_paragraph(element: Tag) -> bool:
     if normalized not in PRIMARY_SECTION_ALIASES.values():
         return False
     return len(text.split()) <= 10 and not any(char in text for char in ".:")
+
+
+def should_skip_root_child(element: Tag) -> bool:
+    """Return whether a direct child of the article should be ignored."""
+
+    classes = set(element.get("class", []))
+    return bool(classes & IGNORED_ROOT_CLASSES)
+
+
+def parse_admonition_section(element: Tag) -> tuple[str, list[str]] | None:
+    """Parse note/admonition blocks that encode section headings plus content."""
+
+    classes = set(element.get("class", []))
+    if "admonition" not in classes:
+        return None
+
+    text = normalized_text(element)
+    if not text:
+        return None
+
+    for label, alias in PRIMARY_SECTION_ALIASES.items():
+        label_title = label.title()
+        if text.startswith(label_title):
+            remainder = text[len(label_title) :].strip(" :.-")
+            return alias, [remainder] if remainder else []
+    return None
+
+
+def append_child_content(target: list[str], child: Tag) -> None:
+    """Append content from a direct article child into the current section."""
+
+    if child.name in {"p", "li"}:
+        append_once(target, normalized_text(child))
+        return
+    if child.name in {"ul", "ol"}:
+        for item in child.find_all("li", recursive=False):
+            append_once(target, normalized_text(item))
+        return
+    if child.name == "div":
+        classes = set(child.get("class", []))
+        if "n8n-templates-widget" in classes:
+            for text in extract_template_titles(child):
+                append_once(target, text)
+            return
+        if "admonition" in classes:
+            return
+        for item in child.find_all(["p", "li"], recursive=False):
+            append_once(target, normalized_text(item))
+
+
+def extract_template_titles(container: Tag) -> list[str]:
+    """Extract likely template titles from the templates widget."""
+
+    titles: list[str] = []
+    for link in container.find_all("a"):
+        text = normalized_text(link)
+        if not text or text.lower() == "view template details":
+            continue
+        append_once(titles, text)
+    if titles:
+        return titles
+
+    # Fallback for simplified fixtures or future markup changes.
+    text = normalized_text(container)
+    for fragment in text.split("View template details"):
+        cleaned = fragment.strip(" -")
+        if cleaned:
+            append_once(titles, cleaned)
+    return titles
 
 
 def merge_section_text(target: dict[str, list[str]], source: dict[str, list[str]]) -> None:
