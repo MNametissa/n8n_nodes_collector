@@ -28,6 +28,7 @@ PRIMARY_SECTION_ALIASES = {
     "related resources": "related_resources",
     "common issues": "common_issues",
     "version notes": "version_notes",
+    "this node can be used as an ai tool": "ai_tool_usage",
     "inputs": "inputs",
     "outputs": "outputs",
 }
@@ -94,7 +95,7 @@ def extract_sections(html: str) -> tuple[str, dict[str, list[str]]]:
     """Extract section text from a node page."""
 
     soup = BeautifulSoup(html, "lxml")
-    root = soup.find("main") or soup.find("article") or soup.body
+    root = soup.select_one("article.md-content__inner") or soup.find("article") or soup.find("main") or soup.body
     if root is None:
         return "", {}
 
@@ -108,7 +109,12 @@ def extract_sections(html: str) -> tuple[str, dict[str, list[str]]]:
             continue
         if element.name == "h1":
             continue
-        if element.name in {"h2", "h3"}:
+        if element.name in {"h2", "h3", "h4", "h5", "h6"}:
+            flush_section(sections, current_key, current_items)
+            current_key = normalize_section_name(normalized_text(element))
+            current_items = []
+            continue
+        if element.name == "p" and is_heading_like_paragraph(element):
             flush_section(sections, current_key, current_items)
             current_key = normalize_section_name(normalized_text(element))
             current_items = []
@@ -132,8 +138,22 @@ def extract_title(root: Tag) -> str:
 def normalize_section_name(value: str) -> str:
     """Normalize a heading into a stable extraction key."""
 
-    normalized = " ".join(value.lower().replace("/", " ").replace("-", " ").split())
+    normalized = " ".join(
+        value.lower().rstrip("#").replace("#", " ").replace("/", " ").replace("-", " ").split()
+    )
     return PRIMARY_SECTION_ALIASES.get(normalized, normalized.replace(" ", "_"))
+
+
+def is_heading_like_paragraph(element: Tag) -> bool:
+    """Return whether a paragraph behaves like a section heading in the docs HTML."""
+
+    text = normalized_text(element)
+    if not text:
+        return False
+    normalized = normalize_section_name(text)
+    if normalized not in PRIMARY_SECTION_ALIASES.values():
+        return False
+    return len(text.split()) <= 10 and not any(char in text for char in ".:")
 
 
 def merge_section_text(target: dict[str, list[str]], source: dict[str, list[str]]) -> None:

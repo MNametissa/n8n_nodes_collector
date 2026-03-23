@@ -28,6 +28,8 @@ def audit_package(
     nodes_missing_summary: list[str] = []
     nodes_missing_operations_or_parameters: list[str] = []
     action_nodes_missing_service: list[str] = []
+    nodes_missing_agent_guidance: list[str] = []
+    action_nodes_missing_credentials: list[str] = []
 
     for entry in map_entries:
         node_path = package_dir / entry["file_json"]
@@ -38,6 +40,8 @@ def audit_package(
         operations = node["operations"]
         node_parameters = node["node_parameters"]
         service = node["service"]
+        credentials_required = node["credentials"]["required"]
+        agent_guidance = node["agent_guidance"]
 
         if "#" in display_name:
             nodes_with_heading_marker.append(node_id)
@@ -47,6 +51,10 @@ def audit_package(
             nodes_missing_operations_or_parameters.append(node_id)
         if node["family"] == "action" and not service:
             action_nodes_missing_service.append(node_id)
+        if not any(agent_guidance.values()):
+            nodes_missing_agent_guidance.append(node_id)
+        if node["family"] == "action" and not credentials_required:
+            action_nodes_missing_credentials.append(node_id)
 
     discovered_nodes_total = None
     coverage_ratio = None
@@ -58,10 +66,33 @@ def audit_package(
             else None
         )
 
+    summary_coverage_ratio = round(
+        1 - (len(nodes_missing_summary) / len(map_entries)),
+        4,
+    ) if map_entries else None
+    operations_or_parameters_coverage_ratio = round(
+        1 - (len(nodes_missing_operations_or_parameters) / len(map_entries)),
+        4,
+    ) if map_entries else None
+    action_nodes_total = sum(1 for entry in map_entries if entry["family"] == "action")
+    action_credentials_coverage_ratio = (
+        round(1 - (len(action_nodes_missing_credentials) / action_nodes_total), 4)
+        if action_nodes_total
+        else None
+    )
+    agent_guidance_coverage_ratio = round(
+        1 - (len(nodes_missing_agent_guidance) / len(map_entries)),
+        4,
+    ) if map_entries else None
+
     readiness_status, notes = classify_readiness(
         package_nodes_total=len(map_entries),
         discovered_nodes_total=discovered_nodes_total,
         coverage_ratio=coverage_ratio,
+        summary_coverage_ratio=summary_coverage_ratio,
+        operations_or_parameters_coverage_ratio=operations_or_parameters_coverage_ratio,
+        action_credentials_coverage_ratio=action_credentials_coverage_ratio,
+        agent_guidance_coverage_ratio=agent_guidance_coverage_ratio,
         families_missing=families_missing,
         nodes_with_heading_marker=nodes_with_heading_marker,
         nodes_missing_summary=nodes_missing_summary,
@@ -76,6 +107,10 @@ def audit_package(
         package_nodes_total=len(map_entries),
         discovered_nodes_total=discovered_nodes_total,
         coverage_ratio=coverage_ratio,
+        summary_coverage_ratio=summary_coverage_ratio,
+        operations_or_parameters_coverage_ratio=operations_or_parameters_coverage_ratio,
+        action_credentials_coverage_ratio=action_credentials_coverage_ratio,
+        agent_guidance_coverage_ratio=agent_guidance_coverage_ratio,
         by_family=by_family,
         families_present=families_present,
         families_missing=families_missing,
@@ -92,6 +127,10 @@ def classify_readiness(
     package_nodes_total: int,
     discovered_nodes_total: int | None,
     coverage_ratio: float | None,
+    summary_coverage_ratio: float | None,
+    operations_or_parameters_coverage_ratio: float | None,
+    action_credentials_coverage_ratio: float | None,
+    agent_guidance_coverage_ratio: float | None,
     families_missing: list[str],
     nodes_with_heading_marker: list[str],
     nodes_missing_summary: list[str],
@@ -105,6 +144,14 @@ def classify_readiness(
         notes.append(
             f"Coverage against discovery report: {package_nodes_total}/{discovered_nodes_total}"
         )
+    if summary_coverage_ratio is not None:
+        notes.append(f"Summary coverage ratio: {summary_coverage_ratio}")
+    if operations_or_parameters_coverage_ratio is not None:
+        notes.append(f"Operations-or-parameters coverage ratio: {operations_or_parameters_coverage_ratio}")
+    if action_credentials_coverage_ratio is not None:
+        notes.append(f"Action-credentials coverage ratio: {action_credentials_coverage_ratio}")
+    if agent_guidance_coverage_ratio is not None:
+        notes.append(f"Agent-guidance coverage ratio: {agent_guidance_coverage_ratio}")
     if families_missing:
         notes.append(f"Missing families: {', '.join(families_missing)}")
     if nodes_with_heading_marker:
@@ -118,17 +165,28 @@ def classify_readiness(
 
     if (
         coverage_ratio is not None
-        and coverage_ratio >= 0.95
+        and coverage_ratio >= 0.99
+        and summary_coverage_ratio is not None
+        and summary_coverage_ratio >= 0.95
+        and operations_or_parameters_coverage_ratio is not None
+        and operations_or_parameters_coverage_ratio >= 0.85
+        and action_credentials_coverage_ratio is not None
+        and action_credentials_coverage_ratio >= 0.85
+        and agent_guidance_coverage_ratio is not None
+        and agent_guidance_coverage_ratio >= 0.5
         and not families_missing
         and not nodes_with_heading_marker
         and not action_nodes_missing_service
-        and len(nodes_missing_summary) <= max(5, int(package_nodes_total * 0.02))
     ):
         return "professional_ready", notes
 
     if (
         coverage_ratio is not None
-        and coverage_ratio >= 0.5
+        and coverage_ratio >= 0.8
+        and summary_coverage_ratio is not None
+        and summary_coverage_ratio >= 0.7
+        and operations_or_parameters_coverage_ratio is not None
+        and operations_or_parameters_coverage_ratio >= 0.5
         and not families_missing
         and not nodes_with_heading_marker
     ):

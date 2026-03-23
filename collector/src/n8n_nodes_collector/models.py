@@ -310,6 +310,10 @@ class AuditReport(BaseModel):
     package_nodes_total: int
     discovered_nodes_total: int | None = None
     coverage_ratio: float | None = None
+    summary_coverage_ratio: float | None = None
+    operations_or_parameters_coverage_ratio: float | None = None
+    action_credentials_coverage_ratio: float | None = None
+    agent_guidance_coverage_ratio: float | None = None
     by_family: dict[str, int] = Field(default_factory=dict)
     families_present: list[str] = Field(default_factory=list)
     families_missing: list[str] = Field(default_factory=list)

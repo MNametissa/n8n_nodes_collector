@@ -29,6 +29,7 @@ def test_audit_package_flags_partial_sample_as_prototype(tmp_path: Path) -> None
     assert report.package_nodes_total == 3
     assert report.discovered_nodes_total == 3
     assert report.coverage_ratio == 1.0
+    assert report.summary_coverage_ratio == 1.0
     assert report.families_missing == ["cluster_sub", "core"]
 
 
@@ -59,3 +60,4 @@ def test_audit_package_command_writes_json_report(tmp_path: Path) -> None:
     payload = json.loads(output_path.read_text(encoding="utf-8"))
     assert payload["readiness_status"] == "prototype"
     assert payload["package_nodes_total"] == 3
+    assert "summary_coverage_ratio" in payload

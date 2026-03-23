@@ -131,3 +131,60 @@ def test_extract_records_merge_supporting_page_sections() -> None:
     assert "Append An Array" in google.section_text["common_issues"]
     assert "Delete document" in google.section_text["operations"]
     assert google.content_hashes["https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/common-issues/"] == "sha256:google-common"
+
+
+def test_extract_records_prefers_article_root_and_paragraph_headings(tmp_path: Path) -> None:
+    html = """\
+<html>
+  <body>
+    <main class="md-main">
+      <nav>
+        <ul>
+          <li>Using n8n</li>
+          <li>Quickstarts</li>
+        </ul>
+      </nav>
+      <article class="md-content__inner md-typeset">
+        <h1>Action Network node #</h1>
+        <p>Use the Action Network node to automate work in Action Network.</p>
+        <p>Credentials</p>
+        <p>Refer to Action Network credentials for guidance on setting up authentication.</p>
+        <h2>Operations #</h2>
+        <ul>
+          <li>Attendance Create Get Get All</li>
+          <li>Person Update</li>
+        </ul>
+      </article>
+    </main>
+  </body>
+</html>
+"""
+    cache_path = tmp_path / "action-network.html"
+    cache_path.write_text(html, encoding="utf-8")
+    fetch_report = FetchReport(
+        records=[
+            FetchRecord(
+                url="https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.actionnetwork/",
+                source_type=SourceType.NODE_PAGE,
+                family=Family.ACTION,
+                source_url="https://docs.n8n.io/integrations/builtin/app-nodes/",
+                http_status=200,
+                content_hash="sha256:test",
+                cache_path=str(cache_path),
+                changed=True,
+            )
+        ]
+    )
+
+    report = extract_records(fetch_report)
+    record = report.records[0]
+
+    assert record.display_name == "Action Network node #"
+    assert record.section_text["summary"] == ["Use the Action Network node to automate work in Action Network."]
+    assert record.section_text["credentials"] == [
+        "Refer to Action Network credentials for guidance on setting up authentication."
+    ]
+    assert record.section_text["operations"] == [
+        "Attendance Create Get Get All",
+        "Person Update",
+    ]
