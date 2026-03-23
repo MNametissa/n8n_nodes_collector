@@ -23,6 +23,52 @@ from .models import (
 )
 from .progress import NullProgressReporter
 
+GENERIC_SECTION_KEYS = {
+    "summary",
+    "templates_examples",
+    "related_resources",
+    "common_issues",
+    "version_notes",
+    "credentials",
+    "ai_tool_usage",
+    "node_options",
+    "inputs",
+    "outputs",
+    "description",
+    "source",
+    "limitations",
+}
+SKIP_SECTION_PATTERNS = (
+    "common_issue",
+    "error",
+    "issue",
+    "troubleshoot",
+    "troubleshooting",
+    "unsupported",
+)
+ACTION_OPERATION_PREFIXES = (
+    "create",
+    "get",
+    "get_all",
+    "update",
+    "delete",
+    "add",
+    "remove",
+    "insert",
+    "retrieve",
+    "find",
+    "list",
+    "send",
+    "append",
+    "clear",
+    "compress",
+    "decompress",
+    "extract",
+    "convert",
+    "sign",
+    "hash",
+)
+
 
 def normalize_records(
     extraction_report: ExtractionReport,
@@ -67,8 +113,8 @@ def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> C
     templates_examples = extracted.section_text.get("templates_examples", [])
     related_resources = extracted.section_text.get("related_resources", [])
     version_notes = extracted.section_text.get("version_notes", [])
-    operations = extracted.section_text.get("operations", []) if extracted.family_hint == Family.ACTION else []
-    node_parameters = extracted.section_text.get("node_parameters", [])
+    operations = derive_operations(extracted)
+    node_parameters = derive_node_parameters(extracted)
     credentials_required = infer_credentials_required(extracted)
 
     return CanonicalNodeRecord(
@@ -100,7 +146,15 @@ def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> C
         capabilities=[],
         limitations=[],
         gotchas=[],
-        agent_guidance=AgentGuidance(),
+        agent_guidance=build_agent_guidance(
+            family=extracted.family_hint,
+            display_name=display_name,
+            service=service,
+            summary=summary,
+            operations=operations,
+            node_parameters=node_parameters,
+            common_issues=common_issues,
+        ),
         related_nodes=[],
         source_sections_present=sorted(extracted.section_text.keys()),
         last_verified_at=verified_at,
@@ -163,6 +217,10 @@ def infer_credentials_required(extracted: ExtractedNodeRecord) -> bool:
 
     if extracted.family_hint == Family.ACTION:
         return bool(extracted.section_text.get("credentials"))
+    if extracted.family_hint == Family.TRIGGER:
+        return bool(extracted.section_text.get("credentials"))
+    if extracted.family_hint in {Family.CLUSTER_ROOT, Family.CLUSTER_SUB}:
+        return bool(extracted.section_text.get("credentials"))
     return False
 
 
@@ -218,6 +276,208 @@ def infer_service(family: Family, display_name: str) -> str | None:
     if family in {Family.CLUSTER_ROOT, Family.CLUSTER_SUB}:
         return "n8n AI"
     return None
+
+
+def derive_operations(extracted: ExtractedNodeRecord) -> list[str]:
+    """Build operations from explicit sections or family-specific fallbacks."""
+
+    explicit = clean_content_list(extracted.section_text.get("operations", []))
+    if explicit:
+        return explicit
+
+    if extracted.family_hint != Family.ACTION:
+        return []
+
+    fallback = [
+        humanize_section_key(key)
+        for key in extracted.section_text
+        if is_action_operation_section(key)
+    ]
+    return dedupe_preserve_order(fallback)
+
+
+def derive_node_parameters(extracted: ExtractedNodeRecord) -> list[str]:
+    """Build node parameters from explicit sections or section-key fallbacks."""
+
+    explicit = clean_content_list(extracted.section_text.get("node_parameters", []))
+    if explicit:
+        return explicit
+
+    fallback = [
+        humanize_section_key(key)
+        for key in extracted.section_text
+        if is_parameter_like_section(key, extracted.family_hint)
+    ]
+    if not fallback and extracted.section_text.get("node_options"):
+        fallback.append(humanize_section_key("node_options"))
+    return dedupe_preserve_order(fallback)
+
+
+def build_agent_guidance(
+    *,
+    family: Family,
+    display_name: str,
+    service: str | None,
+    summary: str,
+    operations: list[str],
+    node_parameters: list[str],
+    common_issues: list[str],
+) -> AgentGuidance:
+    """Build deterministic AI-facing guidance from normalized node signals."""
+
+    subject = service or display_name
+    selection_rules = [selection_rule_for(family, subject, summary)]
+    if operations:
+        selection_rules.append(f"Prefer when you need {short_list(operations, limit=3)}.")
+    if node_parameters:
+        selection_rules.append(f"Configure through parameters such as {short_list(node_parameters, limit=3)}.")
+
+    disambiguation = [disambiguation_rule_for(family, subject)]
+    if common_issues:
+        disambiguation.append("Check documented common issues before falling back to custom workarounds.")
+
+    prompt_hints = build_prompt_hints(subject, operations, node_parameters)
+    retrieval_keywords = build_retrieval_keywords(subject, operations, node_parameters, family)
+
+    return AgentGuidance(
+        selection_rules=dedupe_preserve_order(selection_rules),
+        disambiguation=dedupe_preserve_order(disambiguation),
+        prompt_hints=dedupe_preserve_order(prompt_hints),
+        retrieval_keywords=dedupe_preserve_order(retrieval_keywords),
+    )
+
+
+def selection_rule_for(family: Family, subject: str, summary: str) -> str:
+    """Return the primary selection rule for a node family."""
+
+    if family == Family.ACTION:
+        return f"Choose this node when you need native {subject} integration instead of a generic API call."
+    if family == Family.TRIGGER:
+        return f"Choose this node when a workflow should start from a {subject} event or schedule."
+    if family == Family.CORE:
+        return f"Choose this node for built-in workflow logic or data handling inside n8n."
+    if family == Family.CLUSTER_ROOT:
+        return "Choose this node as the main AI orchestration component that coordinates connected sub-nodes."
+    return "Choose this node as a supporting AI sub-node that augments a parent AI workflow component."
+
+
+def disambiguation_rule_for(family: Family, subject: str) -> str:
+    """Return the primary disambiguation rule for a node family."""
+
+    if family == Family.ACTION:
+        return "Prefer this over HTTP Request when the documented native operations already cover the service workflow."
+    if family == Family.TRIGGER:
+        return "Prefer this over polling or webhook alternatives when the external event source matches the documented trigger behavior."
+    if family == Family.CORE:
+        return "Prefer this over custom code when the built-in node already expresses the required transformation or control flow."
+    if family == Family.CLUSTER_ROOT:
+        return "Use this as the parent AI node; attach models, memory, tools, or retrievers through compatible sub-node connections."
+    return "Use this only with compatible AI parent nodes rather than as a standalone workflow step."
+
+
+def build_prompt_hints(subject: str, operations: list[str], node_parameters: list[str]) -> list[str]:
+    """Build short prompt-like hints for retrieval and orchestration."""
+
+    hints = [f"use {subject.lower()}"]
+    if operations:
+        hints.extend(f"{operation.lower()} in {subject.lower()}" for operation in operations[:3])
+    elif node_parameters:
+        hints.extend(f"configure {parameter.lower()}" for parameter in node_parameters[:3])
+    return hints
+
+
+def build_retrieval_keywords(
+    subject: str,
+    operations: list[str],
+    node_parameters: list[str],
+    family: Family,
+) -> list[str]:
+    """Build deterministic retrieval keywords."""
+
+    keywords = [subject.lower(), family.value.replace("_", " ")]
+    keywords.extend(normalize_keyword_token(operation) for operation in operations[:5])
+    keywords.extend(normalize_keyword_token(parameter) for parameter in node_parameters[:5])
+    return [keyword for keyword in dedupe_preserve_order(keywords) if keyword]
+
+
+def is_action_operation_section(key: str) -> bool:
+    """Return whether a section key likely describes an action operation."""
+
+    if key in GENERIC_SECTION_KEYS:
+        return False
+    if any(pattern in key for pattern in SKIP_SECTION_PATTERNS):
+        return False
+    if key.endswith("_parameters") or key == "events":
+        return False
+    return key.startswith(ACTION_OPERATION_PREFIXES) or "_api" in key or key in {"management_api", "content_api"}
+
+
+def is_parameter_like_section(key: str, family: Family) -> bool:
+    """Return whether a section key should contribute parameter-like guidance."""
+
+    if key in GENERIC_SECTION_KEYS:
+        return False
+    if any(pattern in key for pattern in SKIP_SECTION_PATTERNS):
+        return False
+    if family == Family.ACTION and is_action_operation_section(key):
+        return False
+    if key.endswith("_parameters"):
+        return True
+    if key in {"events", "authentication", "operation_mode", "node_usage_patterns", "rules"}:
+        return True
+    return True
+
+
+def clean_content_list(values: list[str]) -> list[str]:
+    """Normalize extracted list content for canonical storage."""
+
+    cleaned = [" ".join(value.split()) for value in values if value and value.strip()]
+    return dedupe_preserve_order(cleaned)
+
+
+def dedupe_preserve_order(values: list[str]) -> list[str]:
+    """Dedupe while preserving order."""
+
+    seen: set[str] = set()
+    result: list[str] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        result.append(value)
+    return result
+
+
+def humanize_section_key(value: str) -> str:
+    """Convert normalized section keys into human-readable labels."""
+
+    text = value.replace("_", " ").strip()
+    text = re.sub(r"\s+", " ", text)
+    if not text:
+        return text
+    acronyms = {"ai", "api", "n8n", "url", "id", "http", "json", "sql", "csv", "rtf", "ods"}
+    words = []
+    for token in text.split():
+        if token in acronyms:
+            words.append(token.upper() if token != "n8n" else "n8n")
+        elif token == "qa":
+            words.append("Q&A")
+        else:
+            words.append(token.capitalize())
+    return " ".join(words)
+
+
+def short_list(values: list[str], limit: int) -> str:
+    """Return a short comma-separated list."""
+
+    subset = values[:limit]
+    return ", ".join(subset)
+
+
+def normalize_keyword_token(value: str) -> str:
+    """Simplify a value into a compact retrieval keyword."""
+
+    return value.lower().replace(":", " ").replace("(", " ").replace(")", " ").replace("/", " ").strip()
 
 
 def normalize_display_name(value: str) -> str:

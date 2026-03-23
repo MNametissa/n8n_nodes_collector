@@ -36,3 +36,5 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - stricter live extraction from docs article content, including heading cleanup and paragraph-based credentials detection
 - readiness audit thresholds for summary, operations-or-parameters, action credentials, and agent guidance coverage
 - default live fetch concurrency increased to `24`
+- fallback normalization for operations and node parameters from extracted section keys
+- deterministic agent guidance generation for all normalized node families

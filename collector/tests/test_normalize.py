@@ -7,8 +7,8 @@ from typer.testing import CliRunner
 
 from n8n_nodes_collector.cli import app
 from n8n_nodes_collector.extract import extract_records
-from n8n_nodes_collector.models import Family
-from n8n_nodes_collector.normalize import normalize_display_name, normalize_records
+from n8n_nodes_collector.models import ExtractedNodeRecord, Family, SourceType
+from n8n_nodes_collector.normalize import normalize_display_name, normalize_node_record, normalize_records
 
 from test_extract import build_fetch_report, build_fetch_report_with_supporting_pages
 
@@ -29,6 +29,10 @@ def test_normalize_records_builds_canonical_node_and_map_entries() -> None:
     assert google.service == "Google Sheets"
     assert google.credentials.required is True
     assert google.operations == ["Append row", "Read rows", "Update row", "Delete document", "Duplicate document"]
+    assert google.agent_guidance.selection_rules
+    assert google.agent_guidance.disambiguation
+    assert google.agent_guidance.prompt_hints
+    assert google.agent_guidance.retrieval_keywords
     assert google.category_path == ["actions", "google-sheets"]
     assert google.last_verified_at == "2026-03-23"
 
@@ -77,3 +81,27 @@ def test_normalize_display_name_strips_live_docs_heading_artifacts() -> None:
     assert normalize_display_name("Google Sheets node #") == "Google Sheets"
     assert normalize_display_name("Code node #") == "Code"
     assert normalize_display_name("Schedule Trigger") == "Schedule Trigger"
+
+
+def test_normalize_node_record_derives_fallback_parameters_and_guidance() -> None:
+    extracted = ExtractedNodeRecord(
+        node_url="https://docs.n8n.io/integrations/builtin/trigger-nodes/n8n-nodes-base.exampletrigger/",
+        display_name="Example Trigger node #",
+        family_hint=Family.TRIGGER,
+        source_url="https://docs.n8n.io/integrations/builtin/trigger-nodes/",
+        source_type=SourceType.NODE_PAGE,
+        section_text={
+            "summary": ["Use the Example Trigger node to start workflows from example events."],
+            "credentials": ["Use Example credentials."],
+            "events": ["Created", "Updated"],
+            "templates_examples": ["Template"],
+        },
+    )
+
+    node = normalize_node_record(extracted, verified_at="2026-03-23")
+
+    assert node.node_parameters == ["Events"]
+    assert node.credentials.required is True
+    assert node.service is None
+    assert node.agent_guidance.selection_rules
+    assert "example trigger" in " ".join(node.agent_guidance.retrieval_keywords)
