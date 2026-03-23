@@ -67,9 +67,10 @@ def normalize_records(extraction_report: ExtractionReport, verified_at: str | No
 def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> CanonicalNodeRecord:
     """Normalize a single extracted record into the canonical node shape."""
 
-    slug = slugify(extracted.display_name)
+    display_name = normalize_display_name(extracted.display_name)
+    slug = slugify(display_name)
     node_id = build_node_id(extracted.family_hint, slug)
-    service = infer_service(extracted.family_hint, extracted.display_name)
+    service = infer_service(extracted.family_hint, display_name)
     category_path = category_path_for(extracted.family_hint, slug)
     summary = first_value(extracted.section_text, "summary")
     common_issues = extracted.section_text.get("common_issues", [])
@@ -83,9 +84,9 @@ def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> C
     return CanonicalNodeRecord(
         id=node_id,
         slug=slug,
-        display_name=extracted.display_name,
-        display_name_short=extracted.display_name,
-        doc_title=f"{extracted.display_name} node",
+        display_name=display_name,
+        display_name_short=display_name,
+        doc_title=f"{display_name} node",
         family=extracted.family_hint,
         service=service,
         category_path=category_path,
@@ -200,6 +201,15 @@ def infer_service(family: Family, display_name: str) -> str | None:
     if family in {Family.CLUSTER_ROOT, Family.CLUSTER_SUB}:
         return "n8n AI"
     return None
+
+
+def normalize_display_name(value: str) -> str:
+    """Clean a docs heading into a stable display name."""
+
+    cleaned = value.strip()
+    cleaned = re.sub(r"\s+#\s*$", "", cleaned)
+    cleaned = re.sub(r"\s+node\s*$", "", cleaned, flags=re.IGNORECASE)
+    return " ".join(cleaned.split())
 
 
 def category_path_for(family: Family, slug: str) -> list[str]:

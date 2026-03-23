@@ -6,7 +6,8 @@ import json
 from pathlib import Path
 
 from .config import INTERMEDIATE_CACHE_DIR, PACKAGE_DIR, RAW_CACHE_DIR
-from .discovery import discover_from_directory
+from .audit import audit_package, write_audit_report
+from .discovery import discover_from_directory, discover_from_live_sources
 from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
 from .models import DiscoveryReport, FetchReport
@@ -61,6 +62,32 @@ def run_build_from_report(
     rendered_dir = render_package(normalize_report, output_dir=target_package_dir)
     validate_package(rendered_dir)
     return rendered_dir
+
+
+def run_build_live(
+    package_dir: Path | None = None,
+    reports_dir: Path | None = None,
+    cache_dir: Path | None = None,
+    audit_output: Path | None = None,
+) -> tuple[Path, Path | None]:
+    """Discover live official docs pages, build the package, and optionally write an audit report."""
+
+    target_reports_dir = reports_dir or INTERMEDIATE_CACHE_DIR
+    discovery_report = discover_from_live_sources()
+    rendered_dir = run_build_from_report(
+        discovery_report,
+        package_dir=package_dir,
+        reports_dir=target_reports_dir,
+        cache_dir=cache_dir,
+    )
+
+    audit_path = None
+    if audit_output is not None:
+        audit_report = audit_package(rendered_dir, discovery_report=discovery_report)
+        write_audit_report(audit_report, audit_output)
+        audit_path = audit_output
+
+    return rendered_dir, audit_path
 
 
 def write_report_json(payload: dict, path: Path) -> None:

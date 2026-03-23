@@ -8,7 +8,7 @@ from typer.testing import CliRunner
 from n8n_nodes_collector.cli import app
 from n8n_nodes_collector.extract import extract_records
 from n8n_nodes_collector.models import Family
-from n8n_nodes_collector.normalize import normalize_records
+from n8n_nodes_collector.normalize import normalize_display_name, normalize_records
 
 from test_extract import build_fetch_report, build_fetch_report_with_supporting_pages
 
@@ -71,3 +71,9 @@ def test_normalize_command_writes_json_report(tmp_path: Path) -> None:
     node = next(item for item in payload["node_records"] if item["id"] == "n8n.cluster-root.ai-agent")
     assert node["cluster"]["requires_subnodes"] is True
     assert node["service"] == "n8n AI"
+
+
+def test_normalize_display_name_strips_live_docs_heading_artifacts() -> None:
+    assert normalize_display_name("Google Sheets node #") == "Google Sheets"
+    assert normalize_display_name("Code node #") == "Code"
+    assert normalize_display_name("Schedule Trigger") == "Schedule Trigger"

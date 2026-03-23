@@ -7,7 +7,7 @@ from typer.testing import CliRunner
 
 from n8n_nodes_collector.cli import app
 from n8n_nodes_collector.models import DiscoveryReport, FetchRecord, FetchReport, Family, SourceType
-from n8n_nodes_collector.workflows import run_build, run_build_from_report
+from n8n_nodes_collector.workflows import run_build, run_build_from_report, run_build_live
 
 from test_extract import FIXTURE_DIR as EXTRACT_FIXTURE_DIR
 
@@ -194,3 +194,52 @@ def test_build_report_command_runs_pipeline(monkeypatch, tmp_path: Path) -> None
 
     assert result.exit_code == 0
     assert "Built" in result.stdout
+
+
+def test_run_build_live_runs_discovery_build_and_audit(monkeypatch, tmp_path: Path) -> None:
+    discovery_report = DiscoveryReport.model_validate(
+        {
+            "source_urls": ["https://docs.n8n.io/integrations/builtin/app-nodes/"],
+            "candidates": [
+                {
+                    "url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+                    "title": "Google Sheets",
+                    "family": "action",
+                    "source_url": "https://docs.n8n.io/integrations/builtin/app-nodes/",
+                    "source_type": "node_page",
+                    "context": ["Integrations", "Actions"],
+                }
+            ],
+        }
+    )
+    expected_package = tmp_path / "package"
+
+    monkeypatch.setattr("n8n_nodes_collector.workflows.discover_from_live_sources", lambda: discovery_report)
+    monkeypatch.setattr(
+        "n8n_nodes_collector.workflows.run_build_from_report",
+        lambda report, package_dir=None, reports_dir=None, cache_dir=None: expected_package,
+    )
+    monkeypatch.setattr(
+        "n8n_nodes_collector.workflows.audit_package",
+        lambda package_dir, discovery_report=None: {
+            "generated_at": "2026-03-23",
+            "package_dir": str(package_dir),
+            "readiness_status": "prototype",
+            "package_nodes_total": 1,
+        },
+    )
+    monkeypatch.setattr(
+        "n8n_nodes_collector.workflows.write_audit_report",
+        lambda report, output_path: output_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8"),
+    )
+
+    rendered_dir, audit_path = run_build_live(
+        package_dir=expected_package,
+        reports_dir=tmp_path / "reports",
+        cache_dir=tmp_path / "raw",
+        audit_output=tmp_path / "audit.json",
+    )
+
+    assert rendered_dir == expected_package
+    assert audit_path == tmp_path / "audit.json"
+    assert audit_path.exists()

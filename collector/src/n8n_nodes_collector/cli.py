@@ -7,6 +7,7 @@ from pathlib import Path
 
 import typer
 
+from .audit import audit_package, write_audit_report
 from .discovery import discover_from_directory, discover_from_live_sources
 from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
@@ -14,7 +15,7 @@ from .models import DiscoveryReport, ExtractionReport, FetchReport, NormalizeRep
 from .normalize import normalize_records, write_normalize_report
 from .render import render_package
 from .validate import PackageValidationError, validate_package
-from .workflows import refresh_package, run_build, run_build_from_report
+from .workflows import refresh_package, run_build, run_build_from_report, run_build_live
 
 app = typer.Typer(help="Collector for the n8n nodes knowledge package.")
 
@@ -157,6 +158,38 @@ def build_report(
     typer.echo(f"Built {target}")
 
 
+@app.command("build-live")
+def build_live(
+    output_dir: Path = typer.Option(None, "--output-dir", "-o", help="Directory to render the package into."),
+    reports_dir: Path = typer.Option(
+        None,
+        "--reports-dir",
+        help="Directory to write intermediate JSON reports into.",
+    ),
+    cache_dir: Path = typer.Option(
+        None,
+        "--cache-dir",
+        help="Directory to write raw HTML cache entries into.",
+    ),
+    audit_output: Path = typer.Option(
+        None,
+        "--audit-output",
+        help="Optional path to write a readiness audit JSON report.",
+    ),
+) -> None:
+    """Run live discovery plus the full build workflow from official n8n docs."""
+
+    target, audit_path = run_build_live(
+        package_dir=output_dir,
+        reports_dir=reports_dir,
+        cache_dir=cache_dir,
+        audit_output=audit_output,
+    )
+    typer.echo(f"Built {target}")
+    if audit_path is not None:
+        typer.echo(f"Wrote {audit_path}")
+
+
 @app.command()
 def refresh(
     mode: str = typer.Option(..., "--mode", help="Refresh mode: daily, weekly, or monthly."),
@@ -195,6 +228,26 @@ def refresh(
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=1) from exc
     typer.echo(f"Refreshed {target}")
+
+
+@app.command("audit-package")
+def audit_package_command(
+    package_dir: Path = typer.Argument(..., exists=True, file_okay=False, dir_okay=True),
+    output: Path = typer.Option(..., "--output", "-o", help="Path to write the audit report."),
+    discovery_report: Path = typer.Option(
+        None,
+        "--discovery-report",
+        help="Optional discovery report used to compute coverage against the rendered package.",
+    ),
+) -> None:
+    """Audit package readiness for professional workflow-development use."""
+
+    report = audit_package(
+        package_dir,
+        discovery_report=DiscoveryReport.from_path(discovery_report) if discovery_report else None,
+    )
+    write_audit_report(report, output)
+    typer.echo(f"Wrote {output}")
 
 
 def main() -> None:

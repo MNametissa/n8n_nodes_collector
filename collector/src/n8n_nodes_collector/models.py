@@ -297,3 +297,29 @@ class NormalizeReport(BaseModel):
         """Load a normalization report from JSON."""
 
         return cls.model_validate_json(path.read_text(encoding="utf-8"))
+
+
+class AuditReport(BaseModel):
+    """Readiness audit for a rendered package."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    generated_at: str
+    package_dir: str
+    readiness_status: str
+    package_nodes_total: int
+    discovered_nodes_total: int | None = None
+    coverage_ratio: float | None = None
+    by_family: dict[str, int] = Field(default_factory=dict)
+    families_present: list[str] = Field(default_factory=list)
+    families_missing: list[str] = Field(default_factory=list)
+    nodes_with_heading_marker: list[str] = Field(default_factory=list)
+    nodes_missing_summary: list[str] = Field(default_factory=list)
+    nodes_missing_operations_or_parameters: list[str] = Field(default_factory=list)
+    action_nodes_missing_service: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+    def as_sorted_payload(self) -> dict[str, Any]:
+        """Serialize the audit report deterministically."""
+
+        return self.model_dump(mode="json")

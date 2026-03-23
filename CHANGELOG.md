@@ -28,3 +28,4 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - `build-report` workflow support for reproducible package generation from curated discovery reports
 - stricter validation for family/path consistency, source scope, source hash format, markdown identity, and node verification dates
 - live navigation-based discovery for official library pages, plus an explicit live network test path
+- automatic `build-live` orchestration and package readiness audits for full live corpus generation
