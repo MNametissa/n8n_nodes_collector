@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 
 from .config import INTERMEDIATE_CACHE_DIR, PACKAGE_DIR, RAW_CACHE_DIR
@@ -10,8 +11,8 @@ from .audit import audit_package, write_audit_report
 from .discovery import discover_from_directory, discover_from_live_sources
 from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
-from .models import DiscoveryReport, FetchReport
-from .normalize import normalize_records, write_normalize_report
+from .models import DiscoveryReport, FetchReport, NormalizeReport
+from .normalize import build_map_entry, normalize_node_record, normalize_records, normalize_source_records, write_normalize_report
 from .progress import NullProgressReporter
 from .render import render_package
 from .validate import validate_package
@@ -40,6 +41,7 @@ def run_build_from_report(
     reports_dir: Path | None = None,
     cache_dir: Path | None = None,
     progress: object | None = None,
+    snapshot_every: int | None = None,
 ) -> Path:
     """Run fetch, extract, normalize, render, and validate from a discovery report."""
 
@@ -59,7 +61,12 @@ def run_build_from_report(
     extraction_report = extract_records(fetch_report, progress=reporter)
     write_extraction_report(extraction_report, target_reports_dir / "extract-report.json")
 
-    normalize_report = normalize_records(extraction_report, progress=reporter)
+    normalize_report = normalize_with_optional_snapshots(
+        extraction_report,
+        package_dir=target_package_dir,
+        progress=reporter,
+        snapshot_every=snapshot_every,
+    )
     write_normalize_report(normalize_report, target_reports_dir / "normalize-report.json")
 
     rendered_dir = render_package(normalize_report, output_dir=target_package_dir, progress=reporter)
@@ -74,6 +81,7 @@ def run_build_live(
     cache_dir: Path | None = None,
     audit_output: Path | None = None,
     progress: object | None = None,
+    snapshot_every: int = 25,
 ) -> tuple[Path, Path | None]:
     """Discover live official docs pages, build the package, and optionally write an audit report."""
 
@@ -86,6 +94,7 @@ def run_build_live(
         reports_dir=target_reports_dir,
         cache_dir=cache_dir,
         progress=reporter,
+        snapshot_every=snapshot_every,
     )
 
     audit_path = None
@@ -96,6 +105,44 @@ def run_build_live(
         audit_path = audit_output
 
     return rendered_dir, audit_path
+
+
+def normalize_with_optional_snapshots(
+    extraction_report,
+    package_dir: Path,
+    progress,
+    snapshot_every: int | None,
+) -> NormalizeReport:
+    """Normalize records and optionally materialize progressive package snapshots."""
+
+    if not snapshot_every or snapshot_every <= 0:
+        return normalize_records(extraction_report, progress=progress)
+
+    records = sorted(extraction_report.records, key=lambda item: (item.family_hint, item.node_url))
+    reporter = progress or NullProgressReporter()
+    normalize_report = NormalizeReport()
+    normalized_date = date.today().isoformat()
+
+    reporter.stage(
+        "Normalize node records",
+        detail=f"{len(records)} extracted nodes with package snapshots every {snapshot_every}",
+    )
+    with reporter.task("normalize", total=len(records)) as tracker:
+        for index, extracted in enumerate(records, start=1):
+            node = normalize_node_record(extracted, verified_at=normalized_date)
+            normalize_report.node_records.append(node)
+            normalize_report.map_entries.append(build_map_entry(node, extracted))
+            normalize_report.source_records.extend(normalize_source_records(extracted, node))
+            tracker.advance(item=node.id)
+
+            if index % snapshot_every == 0:
+                render_package(normalize_report, output_dir=package_dir, progress=None)
+                reporter.stage(
+                    "Update package snapshot",
+                    detail=f"{index}/{len(records)} nodes rendered into {package_dir}",
+                )
+
+    return normalize_report
 
 
 def write_report_json(payload: dict, path: Path) -> None:

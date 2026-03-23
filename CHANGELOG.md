@@ -30,3 +30,4 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - live navigation-based discovery for official library pages, plus an explicit live network test path
 - automatic `build-live` orchestration and package readiness audits for full live corpus generation
 - terminal progress bars and stage loaders for live discovery and live build workflows
+- progressive package snapshots during `build-live`, so `map` and indexes update while normalization advances

@@ -44,27 +44,7 @@ def normalize_records(
             node = normalize_node_record(extracted, verified_at=normalized_date)
             node_records.append(node)
             source_records.extend(normalize_source_records(extracted, node))
-            map_entries.append(
-                CanonicalMapEntry(
-                    id=node.id,
-                    slug=node.slug,
-                    display_name=node.display_name,
-                    family=node.family,
-                    category_path=node.category_path,
-                    service=node.service,
-                    doc_url=node.doc_url,
-                    file_md=f"{node_folder(node.family, node.slug)}/node.md",
-                    file_json=f"{node_folder(node.family, node.slug)}/node.json",
-                    tags=node.tags,
-                    capabilities=node.capabilities,
-                    related_nodes=node.related_nodes,
-                    requires_credentials=node.credentials.required,
-                    supports_tools_connector=node.cluster.tool_connector,
-                    has_common_issues_page=has_supporting_page(extracted, "common-issues"),
-                    has_templates_section=bool(node.templates_examples),
-                    status=node.status,
-                )
-            )
+            map_entries.append(build_map_entry(node, extracted))
             tracker.advance(item=node.id)
 
     return NormalizeReport(
@@ -149,6 +129,33 @@ def normalize_source_records(
         )
         for url, content_hash in sorted(extracted.content_hashes.items())
     ]
+
+
+def build_map_entry(
+    node: CanonicalNodeRecord,
+    extracted: ExtractedNodeRecord,
+) -> CanonicalMapEntry:
+    """Build the canonical map entry for a normalized node."""
+
+    return CanonicalMapEntry(
+        id=node.id,
+        slug=node.slug,
+        display_name=node.display_name,
+        family=node.family,
+        category_path=node.category_path,
+        service=node.service,
+        doc_url=node.doc_url,
+        file_md=f"{node_folder(node.family, node.slug)}/node.md",
+        file_json=f"{node_folder(node.family, node.slug)}/node.json",
+        tags=node.tags,
+        capabilities=node.capabilities,
+        related_nodes=node.related_nodes,
+        requires_credentials=node.credentials.required,
+        supports_tools_connector=node.cluster.tool_connector,
+        has_common_issues_page=has_supporting_page(extracted, "common-issues"),
+        has_templates_section=bool(node.templates_examples),
+        status=node.status,
+    )
 
 
 def infer_credentials_required(extracted: ExtractedNodeRecord) -> bool:

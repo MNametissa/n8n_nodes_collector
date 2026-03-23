@@ -229,7 +229,7 @@ def test_run_build_live_runs_discovery_build_and_audit(monkeypatch, tmp_path: Pa
     )
     monkeypatch.setattr(
         "n8n_nodes_collector.workflows.run_build_from_report",
-        lambda report, package_dir=None, reports_dir=None, cache_dir=None, progress=None: expected_package,
+        lambda report, package_dir=None, reports_dir=None, cache_dir=None, progress=None, snapshot_every=None: expected_package,
     )
     monkeypatch.setattr(
         "n8n_nodes_collector.workflows.audit_package",
@@ -256,3 +256,45 @@ def test_run_build_live_runs_discovery_build_and_audit(monkeypatch, tmp_path: Pa
     assert rendered_dir == expected_package
     assert audit_path == tmp_path / "audit.json"
     assert audit_path.exists()
+
+
+def test_run_build_from_report_updates_package_snapshots_during_normalize(monkeypatch, tmp_path: Path) -> None:
+    render_calls: list[int] = []
+    monkeypatch.setattr(
+        "n8n_nodes_collector.workflows.fetch_sources",
+        lambda discovery_report, cache_dir=None, progress=None: build_fake_fetch_report(),
+    )
+    monkeypatch.setattr(
+        "n8n_nodes_collector.workflows.render_package",
+        lambda normalize_report, output_dir=None, progress=None: (
+            render_calls.append(len(normalize_report.node_records)) or (output_dir or tmp_path / "package")
+        ),
+    )
+    monkeypatch.setattr("n8n_nodes_collector.workflows.validate_package", lambda package_dir: None)
+
+    discovery_report = DiscoveryReport.model_validate(
+        {
+            "source_urls": ["https://docs.n8n.io/integrations/builtin/app-nodes/"],
+            "candidates": [
+                {
+                    "url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+                    "title": "Google Sheets",
+                    "family": "action",
+                    "source_url": "https://docs.n8n.io/integrations/builtin/app-nodes/",
+                    "source_type": "node_page",
+                    "context": ["App nodes"],
+                }
+            ],
+        }
+    )
+
+    run_build_from_report(
+        discovery_report,
+        package_dir=tmp_path / "package",
+        reports_dir=tmp_path / "reports",
+        cache_dir=tmp_path / "raw",
+        snapshot_every=1,
+    )
+
+    assert render_calls[:-1] == [1, 2, 3]
+    assert render_calls[-1] == 3

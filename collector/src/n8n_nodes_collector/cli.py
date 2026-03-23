@@ -177,6 +177,11 @@ def build_live(
         "--audit-output",
         help="Optional path to write a readiness audit JSON report.",
     ),
+    snapshot_every: int = typer.Option(
+        25,
+        "--snapshot-every",
+        help="Render incremental package snapshots every N normalized nodes during build-live.",
+    ),
 ) -> None:
     """Run live discovery plus the full build workflow from official n8n docs."""
 
@@ -187,6 +192,7 @@ def build_live(
         cache_dir=cache_dir,
         audit_output=audit_output,
         progress=progress,
+        snapshot_every=snapshot_every,
     )
     typer.echo(f"Built {target}")
     if audit_path is not None:
