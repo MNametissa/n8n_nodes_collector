@@ -164,6 +164,28 @@ SERVICE_ALIAS_HINTS = {
     "openai chat model": ["chat model", "llm", "language model"],
     "schedule trigger": ["scheduler", "cron", "time-based trigger"],
 }
+AI_TASK_HINTS = {
+    "text-classifier": {
+        "tags": ["classification", "classifier", "categorization", "sorting", "tri", "labeling"],
+        "capabilities": ["text classification", "categorize text", "sort items by class"],
+    },
+    "information-extractor": {
+        "tags": ["extraction", "structured output", "field extraction", "parsing"],
+        "capabilities": ["extract structured information", "pull fields from text"],
+    },
+    "basic-llm-chain": {
+        "tags": ["prompting", "instructions", "generation", "classification"],
+        "capabilities": ["follow prompt instructions", "single-step llm task", "prompt-based classification"],
+    },
+    "ai-agent": {
+        "tags": ["agentic", "reasoning", "tool use", "multi-step"],
+        "capabilities": ["agentic reasoning", "tool-using workflow orchestration"],
+    },
+    "openrouter-chat-model": {
+        "tags": ["provider", "llm provider", "openrouter", "chat model"],
+        "capabilities": ["language model provider", "chat completion model"],
+    },
+}
 
 
 def normalize_records(
@@ -575,6 +597,7 @@ def derive_tags(
     tags.extend(extract_keywords(" ".join(node_parameters[:3]), limit=4))
     if family in {Family.CLUSTER_ROOT, Family.CLUSTER_SUB}:
         tags.append("ai")
+    tags.extend(ai_task_tags(slugify(display_name)))
     return dedupe_preserve_order(tags)[:16]
 
 
@@ -602,6 +625,7 @@ def derive_capabilities(
         capabilities.append("ai workflow orchestration")
     if family == Family.CLUSTER_SUB:
         capabilities.append("ai sub-component")
+    capabilities.extend(ai_task_capabilities(slugify(display_name)))
     return dedupe_preserve_order([cap for cap in capabilities if cap])[:12]
 
 
@@ -729,6 +753,18 @@ def match_domain_hints(value: str) -> list[str]:
         if any(re.search(rf"\b{re.escape(keyword)}\b", lowered) for keyword in keywords):
             matches.append(domain)
     return matches
+
+
+def ai_task_tags(slug: str) -> list[str]:
+    """Return explicit AI task tags for known AI-focused nodes."""
+
+    return list(AI_TASK_HINTS.get(slug, {}).get("tags", []))
+
+
+def ai_task_capabilities(slug: str) -> list[str]:
+    """Return explicit AI task capabilities for known AI-focused nodes."""
+
+    return list(AI_TASK_HINTS.get(slug, {}).get("capabilities", []))
 
 
 def normalize_display_name(value: str) -> str:
