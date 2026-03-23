@@ -16,6 +16,7 @@ from .models import DiscoveryReport, ExtractionReport, FetchReport, NormalizeRep
 from .normalize import normalize_records, write_normalize_report
 from .progress import TerminalProgressReporter
 from .render import render_package
+from .resolver import resolve_package_query
 from .validate import PackageValidationError, validate_package
 from .workflows import refresh_package, run_build, run_build_from_report, run_build_live
 
@@ -295,6 +296,31 @@ def audit_package_command(
     )
     write_audit_report(report, output)
     typer.echo(f"Wrote {output}")
+
+
+@app.command()
+def resolve(
+    package_dir: Path = typer.Argument(..., exists=True, file_okay=False, dir_okay=True),
+    query: str = typer.Argument(..., help="Free-form node lookup query."),
+    family: str = typer.Option(None, "--family", help="Optional family filter."),
+    limit: int = typer.Option(5, "--limit", min=1, help="Maximum number of ranked candidates to return."),
+    expand_concurrency: int = typer.Option(
+        4,
+        "--expand-concurrency",
+        min=1,
+        help="Maximum concurrent node.json reads during candidate expansion.",
+    ),
+) -> None:
+    """Resolve a query against a rendered package with specialized-first ranking."""
+
+    payload = resolve_package_query(
+        package_dir,
+        query,
+        family=family,
+        limit=limit,
+        expand_concurrency=expand_concurrency,
+    )
+    typer.echo(json.dumps(payload, indent=2) + "\n")
 
 
 def main() -> None:

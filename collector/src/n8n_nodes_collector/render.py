@@ -42,7 +42,7 @@ def render_package(
     )
 
     write_text(target / "README.md", render_readme())
-    write_text(target / "SKILLS.md", render_skills())
+    write_text(target / "SKILLS.md", render_skills(normalize_report.node_records))
     write_json(
         target / "package-manifest.json",
         build_package_manifest(normalize_report, package_version, build_date, snapshot_date),
@@ -56,7 +56,7 @@ def render_package(
     write_json(target / "sources.json", build_sources(normalize_report))
     write_json(target / "stats.json", build_stats(normalize_report.node_records))
     render_indexes(normalize_report, target / "indexes")
-    render_auxiliary(target / "auxiliary")
+    render_auxiliary(normalize_report.node_records, target / "auxiliary")
     reporter.stage("Render package", detail=f"{len(normalize_report.node_records)} node artifacts")
     render_nodes(normalize_report.node_records, target, progress=reporter)
     return target
@@ -159,11 +159,66 @@ def render_indexes(normalize_report: NormalizeReport, indexes_dir: Path) -> None
     write_json(indexes_dir / "by-doc-url.json", dict(sorted(by_doc_url.items())))
 
 
-def render_auxiliary(auxiliary_dir: Path) -> None:
-    write_json(auxiliary_dir / "aliases.json", {})
-    write_json(auxiliary_dir / "crosswalks.json", {})
+def render_auxiliary(node_records: list[CanonicalNodeRecord], auxiliary_dir: Path) -> None:
+    write_json(auxiliary_dir / "aliases.json", build_aliases(node_records))
+    write_json(auxiliary_dir / "crosswalks.json", build_crosswalks(node_records))
     write_json(auxiliary_dir / "credential-only-nodes.json", [])
     write_json(auxiliary_dir / "deprecated-or-versioned-notes.json", [])
+
+
+def build_aliases(node_records: list[CanonicalNodeRecord]) -> dict[str, list[str]]:
+    aliases: dict[str, list[str]] = defaultdict(list)
+
+    for node in node_records:
+        seeds = {
+            node.id,
+            node.slug,
+            node.slug.replace("-", " "),
+            node.display_name.lower(),
+        }
+        if node.service:
+            seeds.add(node.service.lower())
+        seeds.update(node.tags[:8])
+
+        for alias in sorted(seed for seed in seeds if seed):
+            aliases[alias].append(node.id)
+
+    return sort_index_map(aliases)
+
+
+def build_crosswalks(node_records: list[CanonicalNodeRecord]) -> dict[str, list[dict[str, str]]]:
+    http_request_id = next((node.id for node in node_records if node.slug == "http-request"), None)
+    cluster_roots = [node.id for node in node_records if node.family == Family.CLUSTER_ROOT]
+    cluster_subs = [node.id for node in node_records if node.family == Family.CLUSTER_SUB]
+
+    specialized_vs_generic: list[dict[str, str]] = []
+    if http_request_id is not None:
+        for node in sorted(node_records, key=lambda item: item.id):
+            if node.family != Family.ACTION:
+                continue
+            specialized_vs_generic.append(
+                {
+                    "specialized": node.id,
+                    "generic_alternative": http_request_id,
+                    "rule": f"Prefer {node.display_name} for supported native operations; use HTTP Request only for unsupported API needs.",
+                }
+            )
+
+    cluster_relationships: list[dict[str, str]] = []
+    for root_id in cluster_roots:
+        for sub_id in cluster_subs[:8]:
+            cluster_relationships.append(
+                {
+                    "root": root_id,
+                    "sub": sub_id,
+                    "rule": "Cluster sub-nodes extend a compatible AI root node and are not standalone workflow roots.",
+                }
+            )
+
+    return {
+        "specialized_vs_generic": specialized_vs_generic,
+        "cluster_relationships": cluster_relationships,
+    }
 
 
 def render_nodes(node_records: list[CanonicalNodeRecord], output_dir: Path, progress: object | None = None) -> None:
@@ -272,12 +327,83 @@ def render_readme() -> str:
     )
 
 
-def render_skills() -> str:
-    return (
-        "# SKILLS.md\n\n"
-        "Start with `package-manifest.json`, then `map.json`, then the target `node.json`.\n"
-        "Do not invent operations, parameters, or credentials when source fields are empty.\n"
-    )
+def render_skills(node_records: list[CanonicalNodeRecord]) -> str:
+    family_counts: dict[str, int] = defaultdict(int)
+    for node in node_records:
+        family_counts[node.family] += 1
+
+    return "\n".join(
+        [
+            "# SKILLS.md",
+            "",
+            "## Purpose",
+            "",
+            "This package is a structured knowledge base for official n8n nodes.",
+            "Use it to resolve nodes quickly, recommend the best-fit node, compare alternatives, and avoid hallucinated capabilities.",
+            "",
+            "## Scope",
+            "",
+            "The corpus covers official built-in nodes collected from the n8n docs snapshot represented by `package-manifest.json`.",
+            "Treat freshness and completeness as bounded by `coverage_status`, `build_date`, `documentation_snapshot_date`, and each node's `last_verified_at`.",
+            "",
+            "## Canonical Lookup Order",
+            "",
+            "1. Read `package-manifest.json` to understand scope and freshness.",
+            "2. Resolve candidates through `map.json` and `indexes/*`.",
+            "3. Use `auxiliary/aliases.json` and `auxiliary/crosswalks.json` for renamed, related, or specialized-vs-generic routing.",
+            "4. Open the selected `node.json` as the canonical structured source.",
+            "5. Use `node.md` only for narrative explanation after `node.json` is already resolved.",
+            "",
+            "Do not scan package folders blindly when an index or alias file can answer the question directly.",
+            "",
+            "## Retrieval Strategy",
+            "",
+            "When resolving a request, prefer this order:",
+            "1. exact `id`",
+            "2. exact `slug`",
+            "3. exact `display_name`",
+            "4. exact `service` match via `indexes/by-service.json`",
+            "5. alias match via `auxiliary/aliases.json`",
+            "6. capability and tag match via `indexes/by-capability.json` and `indexes/by-tag.json`",
+            "",
+            "## Specialized-First Policy",
+            "",
+            "Prefer specialized app nodes over generic nodes when the specialized node covers the requested operation.",
+            "Use `HTTP Request` only as a fallback when the specialized node does not expose the needed operation or the package guidance explicitly says to fall back.",
+            "If a user mentions a service directly, search that service first. Example: for Odoo work, resolve the Odoo node before considering generic API calls.",
+            "",
+            "## Disambiguation Rules",
+            "",
+            "- Distinguish action nodes from trigger nodes. Trigger nodes start workflows; action nodes perform work inside a running workflow.",
+            "- Distinguish app nodes from core nodes. Core nodes express workflow logic or generic protocol access.",
+            "- Distinguish `cluster_root` from `cluster_sub`. Sub-nodes are not standalone roots.",
+            "- When several matches exist, rank exact service and specialized capability matches above generic alternatives.",
+            "",
+            "## Concurrent Usage Guidance",
+            "",
+            "For fast agent usage, do not expand every node. Query indexes in parallel, merge candidates, score them, then open only the top few `node.json` records.",
+            "A good default is concurrent lookup across `by-name`, `by-service`, `by-tag`, `by-capability`, and `aliases`, followed by concurrent expansion of the top 3 to 5 candidate node files.",
+            "",
+            "## Response Policy",
+            "",
+            "- Separate extracted facts from derived guidance.",
+            "- Do not invent operations, parameters, credentials, or compatibility when fields are empty.",
+            "- Prefer canonical `display_name` and `id` values over guessed naming.",
+            "- Mention uncertainty when freshness is partial or the package lacks the required field.",
+            "",
+            "## Suggested Answer Patterns",
+            "",
+            "For `Which node should I use?`: best-fit node, why it fits, second-best alternative, and fallback guidance if needed.",
+            "For `Compare these nodes`: family, execution role, credentials, operations or parameters, limitations, and best-fit scenarios.",
+            "For `How do I use this node?`: summary, credentials, operations or parameters, pitfalls, and related nodes.",
+            "",
+            "## Package Snapshot",
+            "",
+            f"- Nodes included: {len(node_records)}",
+            f"- Families included: {', '.join(f'{family}={count}' for family, count in sorted(family_counts.items()))}",
+            "",
+        ]
+    ) + "\n"
 
 
 def sort_index_map(index_map: dict[str, list[str]]) -> dict[str, list[str]]:

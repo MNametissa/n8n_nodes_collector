@@ -68,6 +68,102 @@ ACTION_OPERATION_PREFIXES = (
     "sign",
     "hash",
 )
+GENERIC_CONTENT_VALUES = {
+    "operations",
+    "node parameters",
+    "templates and examples",
+    "related resources",
+    "common issues",
+    "source",
+}
+STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "api",
+    "app",
+    "applications",
+    "automate",
+    "automation",
+    "be",
+    "built",
+    "by",
+    "can",
+    "data",
+    "do",
+    "for",
+    "from",
+    "get",
+    "getting",
+    "how",
+    "hour",
+    "hours",
+    "in",
+    "including",
+    "integrate",
+    "integration",
+    "is",
+    "it",
+    "its",
+    "manage",
+    "make",
+    "need",
+    "n8n",
+    "node",
+    "of",
+    "official",
+    "or",
+    "other",
+    "range",
+    "started",
+    "supported",
+    "supports",
+    "that",
+    "the",
+    "this",
+    "through",
+    "to",
+    "use",
+    "using",
+    "wide",
+    "week",
+    "weeks",
+    "with",
+    "workflow",
+    "workflows",
+    "work",
+    "every",
+    "day",
+    "days",
+    "month",
+    "months",
+    "minute",
+    "minutes",
+    "second",
+    "seconds",
+    "learning",
+}
+DOMAIN_HINTS = {
+    "spreadsheet": ("spreadsheet", "sheets", "row", "rows", "sheet", "tabular"),
+    "erp": ("erp", "odoo", "erpnext"),
+    "crm": ("crm", "contact", "contacts", "lead", "leads", "opportunity", "opportunities"),
+    "invoice": ("invoice", "invoices", "billing", "bill"),
+    "database": ("database", "sql", "postgres", "mysql", "query", "record", "records"),
+    "email": ("email", "emails", "mail", "gmail", "outlook"),
+    "calendar": ("calendar", "event", "events", "schedule"),
+    "chat": ("chat", "message", "messages", "conversation", "assistant"),
+    "storage": ("storage", "drive", "file", "files", "bucket", "document", "documents"),
+    "api": ("api", "http", "rest", "request", "endpoint"),
+    "ai": ("ai", "agent", "model", "embedding", "retriever", "memory", "tool"),
+}
+SERVICE_ALIAS_HINTS = {
+    "odoo": ["erp", "business management"],
+    "google sheets": ["spreadsheet", "sheets"],
+    "http request": ["api", "rest api", "http client"],
+    "ai agent": ["agent orchestration", "tool-using agent"],
+    "openai chat model": ["chat model", "llm", "language model"],
+    "schedule trigger": ["scheduler", "cron", "time-based trigger"],
+}
 
 
 def normalize_records(
@@ -89,9 +185,13 @@ def normalize_records(
         for extracted in records:
             node = normalize_node_record(extracted, verified_at=normalized_date)
             node_records.append(node)
-            source_records.extend(normalize_source_records(extracted, node))
-            map_entries.append(build_map_entry(node, extracted))
             tracker.advance(item=node.id)
+
+    enrich_routing_metadata(node_records)
+
+    for extracted, node in zip(records, node_records, strict=True):
+        source_records.extend(normalize_source_records(extracted, node))
+        map_entries.append(build_map_entry(node, extracted))
 
     return NormalizeReport(
         map_entries=map_entries,
@@ -116,6 +216,11 @@ def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> C
     operations = derive_operations(extracted)
     node_parameters = derive_node_parameters(extracted)
     credentials_required = infer_credentials_required(extracted)
+    source_sections_present = set(extracted.section_text.keys())
+    if operations:
+        source_sections_present.add("operations")
+    if node_parameters:
+        source_sections_present.add("node_parameters")
 
     return CanonicalNodeRecord(
         id=node_id,
@@ -142,8 +247,22 @@ def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> C
         related_resources=related_resources,
         common_issues=common_issues,
         version_notes=version_notes,
-        tags=[],
-        capabilities=[],
+        tags=derive_tags(
+            family=extracted.family_hint,
+            display_name=display_name,
+            service=service,
+            summary=summary,
+            operations=operations,
+            node_parameters=node_parameters,
+        ),
+        capabilities=derive_capabilities(
+            family=extracted.family_hint,
+            display_name=display_name,
+            service=service,
+            summary=summary,
+            operations=operations,
+            node_parameters=node_parameters,
+        ),
         limitations=[],
         gotchas=[],
         agent_guidance=build_agent_guidance(
@@ -156,7 +275,7 @@ def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> C
             common_issues=common_issues,
         ),
         related_nodes=[],
-        source_sections_present=sorted(extracted.section_text.keys()),
+        source_sections_present=sorted(source_sections_present),
         last_verified_at=verified_at,
         status="active",
     )
@@ -347,6 +466,38 @@ def build_agent_guidance(
     )
 
 
+def enrich_routing_metadata(node_records: list[CanonicalNodeRecord]) -> None:
+    """Fill package-level routing relationships once all nodes are known."""
+
+    by_id = {node.id: node for node in node_records}
+    http_request_id = next((node.id for node in node_records if node.slug == "http-request"), None)
+    cluster_roots = [node.id for node in node_records if node.family == Family.CLUSTER_ROOT]
+    cluster_subs = [node.id for node in node_records if node.family == Family.CLUSTER_SUB]
+
+    for node in node_records:
+        related: list[str] = []
+        if node.family == Family.ACTION and http_request_id is not None and node.id != http_request_id:
+            related.append(http_request_id)
+        if node.family == Family.CLUSTER_ROOT:
+            related.extend(cluster_subs[:5])
+        if node.family == Family.CLUSTER_SUB:
+            related.extend(cluster_roots[:3])
+        node.related_nodes = dedupe_preserve_order(related)
+        node.agent_guidance.retrieval_keywords = dedupe_preserve_order(
+            node.agent_guidance.retrieval_keywords + node.tags + node.capabilities
+        )
+        if http_request_id is not None and node.family == Family.ACTION:
+            node.agent_guidance.disambiguation = dedupe_preserve_order(
+                node.agent_guidance.disambiguation
+                + ["Fallback to HTTP Request only when the required service operation is not exposed natively."]
+            )
+
+    if http_request_id is not None:
+        http_request = by_id[http_request_id]
+        action_ids = [candidate.id for candidate in node_records if candidate.family == Family.ACTION][:12]
+        http_request.related_nodes = dedupe_preserve_order(http_request.related_nodes + action_ids)
+
+
 def selection_rule_for(family: Family, subject: str, summary: str) -> str:
     """Return the primary selection rule for a node family."""
 
@@ -400,6 +551,60 @@ def build_retrieval_keywords(
     return [keyword for keyword in dedupe_preserve_order(keywords) if keyword]
 
 
+def derive_tags(
+    *,
+    family: Family,
+    display_name: str,
+    service: str | None,
+    summary: str,
+    operations: list[str],
+    node_parameters: list[str],
+) -> list[str]:
+    """Derive deterministic retrieval tags for a node."""
+
+    tags: list[str] = []
+    tags.extend(extract_keywords(display_name))
+    if service:
+        tags.extend(extract_keywords(service))
+        tags.extend(SERVICE_ALIAS_HINTS.get(service.lower(), []))
+    tags.extend(SERVICE_ALIAS_HINTS.get(display_name.lower(), []))
+    tags.append(family.value.replace("_", " "))
+    tags.extend(match_domain_hints(" ".join([display_name, service or "", summary])))
+    tags.extend(extract_keywords(summary, limit=6))
+    tags.extend(extract_keywords(" ".join(operations[:3]), limit=6))
+    tags.extend(extract_keywords(" ".join(node_parameters[:3]), limit=4))
+    if family in {Family.CLUSTER_ROOT, Family.CLUSTER_SUB}:
+        tags.append("ai")
+    return dedupe_preserve_order(tags)[:16]
+
+
+def derive_capabilities(
+    *,
+    family: Family,
+    display_name: str,
+    service: str | None,
+    summary: str,
+    operations: list[str],
+    node_parameters: list[str],
+) -> list[str]:
+    """Derive deterministic capability strings for ranking and retrieval."""
+
+    capabilities = [normalize_capability(item) for item in operations[:8]]
+    if not capabilities:
+        capabilities.extend(normalize_capability(item) for item in node_parameters[:6])
+    if family == Family.ACTION and service:
+        capabilities.append(f"native {service.lower()} integration")
+    if family == Family.TRIGGER:
+        capabilities.append("start workflow from external event")
+    if family == Family.CORE:
+        capabilities.append("built-in workflow logic")
+    if family == Family.CLUSTER_ROOT:
+        capabilities.append("ai workflow orchestration")
+    if family == Family.CLUSTER_SUB:
+        capabilities.append("ai sub-component")
+    return dedupe_preserve_order([cap for cap in capabilities if cap])[:12]
+
+
 def is_action_operation_section(key: str) -> bool:
     """Return whether a section key likely describes an action operation."""
 
@@ -431,7 +636,15 @@ def is_parameter_like_section(key: str, family: Family) -> bool:
 def clean_content_list(values: list[str]) -> list[str]:
     """Normalize extracted list content for canonical storage."""
 
-    cleaned = [" ".join(value.split()) for value in values if value and value.strip()]
+    cleaned: list[str] = []
+    for value in values:
+        if not value or not value.strip():
+            continue
+        normalized = " ".join(value.split())
+        normalized = re.sub(r"\s+#\s*$", "", normalized).strip()
+        if normalized.lower() in GENERIC_CONTENT_VALUES:
+            continue
+        cleaned.append(normalized)
     return dedupe_preserve_order(cleaned)
 
 
@@ -478,6 +691,44 @@ def normalize_keyword_token(value: str) -> str:
     """Simplify a value into a compact retrieval keyword."""
 
     return value.lower().replace(":", " ").replace("(", " ").replace(")", " ").replace("/", " ").strip()
+
+
+def normalize_capability(value: str) -> str:
+    """Normalize a string into a concise capability phrase."""
+
+    text = normalize_keyword_token(value)
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s+#\s*$", "", text)
+    if text in GENERIC_CONTENT_VALUES:
+        return ""
+    return text.strip(" -")
+
+
+def extract_keywords(value: str, limit: int = 8) -> list[str]:
+    """Extract compact retrieval terms from text."""
+
+    tokens = re.findall(r"[a-z0-9][a-z0-9+.-]*", value.lower())
+    keywords: list[str] = []
+    for token in tokens:
+        if token in STOPWORDS:
+            continue
+        if len(token) < 3 and token not in {"ai", "db"}:
+            continue
+        if token.isdigit():
+            continue
+        keywords.append(token)
+    return dedupe_preserve_order(keywords)[:limit]
+
+
+def match_domain_hints(value: str) -> list[str]:
+    """Return domain tags that can be inferred from text."""
+
+    lowered = value.lower()
+    matches: list[str] = []
+    for domain, keywords in DOMAIN_HINTS.items():
+        if any(re.search(rf"\b{re.escape(keyword)}\b", lowered) for keyword in keywords):
+            matches.append(domain)
+    return matches
 
 
 def normalize_display_name(value: str) -> str:

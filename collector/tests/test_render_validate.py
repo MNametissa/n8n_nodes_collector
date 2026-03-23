@@ -36,8 +36,15 @@ def test_render_package_writes_required_artifacts(tmp_path: Path) -> None:
 
     stats = json.loads((package_dir / "stats.json").read_text(encoding="utf-8"))
     manifest = json.loads((package_dir / "package-manifest.json").read_text(encoding="utf-8"))
+    skills = (package_dir / "SKILLS.md").read_text(encoding="utf-8")
+    aliases = json.loads((package_dir / "auxiliary" / "aliases.json").read_text(encoding="utf-8"))
+    google = json.loads((package_dir / "nodes" / "actions" / "google-sheets" / "node.json").read_text(encoding="utf-8"))
     assert stats["nodes_total"] == 3
     assert manifest["node_count"] == 3
+    assert "Specialized-First Policy" in skills
+    assert aliases["google sheets"] == ["n8n.action.google-sheets"]
+    assert google["tags"]
+    assert google["capabilities"]
 
 
 def test_validate_package_accepts_rendered_output(tmp_path: Path) -> None:
