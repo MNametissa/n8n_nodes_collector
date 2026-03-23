@@ -10,7 +10,8 @@ import typer
 from .discovery import discover_from_directory
 from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
-from .models import DiscoveryReport, FetchReport
+from .models import DiscoveryReport, ExtractionReport, FetchReport
+from .normalize import normalize_records, write_normalize_report
 
 app = typer.Typer(help="Collector for the n8n nodes knowledge package.")
 
@@ -56,6 +57,19 @@ def extract(
     report = FetchReport.from_path(fetch_report)
     extraction_report = extract_records(report)
     write_extraction_report(extraction_report, output)
+    typer.echo(f"Wrote {output}")
+
+
+@app.command()
+def normalize(
+    extraction_report: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True),
+    output: Path = typer.Option(..., "--output", "-o", help="Path to write the normalization report."),
+) -> None:
+    """Normalize extracted records into canonical package-shaped records."""
+
+    report = ExtractionReport.from_path(extraction_report)
+    normalize_report = normalize_records(report)
+    write_normalize_report(normalize_report, output)
     typer.echo(f"Wrote {output}")
 
 

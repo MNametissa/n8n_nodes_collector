@@ -15,3 +15,5 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - fixture-based tests for discovery and fetch/cache behavior
 - working `extract` command with intermediate node-record output
 - fixture-based tests for extraction over the three sample node pages
+- working `normalize` command for canonical node and map records
+- fixture-based tests for normalization against the schema contract
