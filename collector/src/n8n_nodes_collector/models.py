@@ -269,3 +269,9 @@ class NormalizeReport(BaseModel):
                 for record in sorted(self.node_records, key=lambda item: item.id)
             ],
         }
+
+    @classmethod
+    def from_path(cls, path: Path) -> "NormalizeReport":
+        """Load a normalization report from JSON."""
+
+        return cls.model_validate_json(path.read_text(encoding="utf-8"))

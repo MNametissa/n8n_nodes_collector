@@ -14,6 +14,7 @@ from .models import DiscoveryReport, ExtractionReport, FetchReport, NormalizeRep
 from .normalize import normalize_records, write_normalize_report
 from .render import render_package
 from .validate import PackageValidationError, validate_package
+from .workflows import run_build
 
 app = typer.Typer(help="Collector for the n8n nodes knowledge package.")
 
@@ -102,10 +103,24 @@ def validate(
 
 
 @app.command()
-def build() -> None:
-    """Reserved for the full build phase."""
+def build(
+    input_dir: Path = typer.Argument(..., exists=True, file_okay=False, dir_okay=True),
+    output_dir: Path = typer.Option(None, "--output-dir", "-o", help="Directory to render the package into."),
+    reports_dir: Path = typer.Option(
+        None,
+        "--reports-dir",
+        help="Directory to write intermediate JSON reports into.",
+    ),
+    cache_dir: Path = typer.Option(
+        None,
+        "--cache-dir",
+        help="Directory to write raw HTML cache entries into.",
+    ),
+) -> None:
+    """Run the full collector build workflow."""
 
-    raise typer.Exit(code=1)
+    target = run_build(input_dir, package_dir=output_dir, reports_dir=reports_dir, cache_dir=cache_dir)
+    typer.echo(f"Built {target}")
 
 
 def main() -> None:

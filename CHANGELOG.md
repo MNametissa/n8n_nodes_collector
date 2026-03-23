@@ -20,3 +20,5 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - working `render` command for canonical package artifacts under `package/`
 - working `validate` command for rendered package consistency checks
 - render/validate tests covering success paths, CLI wiring, and a validator failure case
+- working `build` orchestration command for the full collector pipeline
+- end-to-end tests proving discover/fetch/extract/normalize/render/validate sequencing
