@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from io import StringIO
 
-from n8n_nodes_collector.progress import TerminalProgressReporter
+from n8n_nodes_collector.progress import OverallProgressReporter, TerminalProgressReporter
 
 
 def test_terminal_progress_reporter_renders_stage_and_bar() -> None:
@@ -20,3 +20,24 @@ def test_terminal_progress_reporter_renders_stage_and_bar() -> None:
     assert "[fetch]" in output
     assert "100%" in output
     assert "3/3" in output
+
+
+def test_overall_progress_reporter_aggregates_nested_tasks() -> None:
+    stream = StringIO()
+    base = TerminalProgressReporter(stream=stream, force=True)
+    reporter = OverallProgressReporter(base, label="build-live")
+
+    with reporter.track() as tracked:
+        tracked.stage("Discover live sources", detail="2 library pages")
+        with tracked.task("discover", total=2) as tracker:
+            tracker.advance(item="one")
+            tracker.advance(item="two")
+        with tracked.task("fetch", total=1) as tracker:
+            tracker.advance(item="three")
+        tracked.add_total(1)
+        tracked.advance(item="validate")
+
+    output = stream.getvalue()
+    assert "[build-live]" in output
+    assert "4/4" in output
+    assert "100%" in output

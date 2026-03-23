@@ -13,7 +13,7 @@ from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
 from .models import DiscoveryReport, FetchReport, NormalizeReport
 from .normalize import build_map_entry, normalize_node_record, normalize_records, normalize_source_records, write_normalize_report
-from .progress import NullProgressReporter
+from .progress import NullProgressReporter, OverallProgressReporter
 from .render import render_package
 from .validate import validate_package
 
@@ -76,8 +76,12 @@ def run_build_from_report(
     write_normalize_report(normalize_report, target_reports_dir / "normalize-report.json")
 
     rendered_dir = render_package(normalize_report, output_dir=target_package_dir, progress=reporter)
+    if hasattr(reporter, "add_total"):
+        reporter.add_total(1)
     reporter.stage("Validate package", detail=str(rendered_dir))
     validate_package(rendered_dir)
+    if hasattr(reporter, "advance"):
+        reporter.advance(item="validate")
     return rendered_dir
 
 
@@ -94,25 +98,30 @@ def run_build_live(
 
     target_reports_dir = reports_dir or INTERMEDIATE_CACHE_DIR
     reporter = progress or NullProgressReporter()
-    discovery_report = discover_from_live_sources(progress=reporter)
-    rendered_dir = run_build_from_report(
-        discovery_report,
-        package_dir=package_dir,
-        reports_dir=target_reports_dir,
-        cache_dir=cache_dir,
-        progress=reporter,
-        snapshot_every=snapshot_every,
-        fetch_concurrency=fetch_concurrency,
-    )
+    aggregate = OverallProgressReporter(reporter, label="build-live")
 
-    audit_path = None
-    if audit_output is not None:
-        reporter.stage("Audit package", detail=str(rendered_dir))
-        audit_report = audit_package(rendered_dir, discovery_report=discovery_report)
-        write_audit_report(audit_report, audit_output)
-        audit_path = audit_output
+    with aggregate.track() as tracked_reporter:
+        discovery_report = discover_from_live_sources(progress=tracked_reporter)
+        rendered_dir = run_build_from_report(
+            discovery_report,
+            package_dir=package_dir,
+            reports_dir=target_reports_dir,
+            cache_dir=cache_dir,
+            progress=tracked_reporter,
+            snapshot_every=snapshot_every,
+            fetch_concurrency=fetch_concurrency,
+        )
 
-    return rendered_dir, audit_path
+        audit_path = None
+        if audit_output is not None:
+            tracked_reporter.add_total(1)
+            tracked_reporter.stage("Audit package", detail=str(rendered_dir))
+            audit_report = audit_package(rendered_dir, discovery_report=discovery_report)
+            write_audit_report(audit_report, audit_output)
+            tracked_reporter.advance(item="audit")
+            audit_path = audit_output
+
+        return rendered_dir, audit_path
 
 
 def normalize_with_optional_snapshots(
@@ -146,8 +155,8 @@ def normalize_with_optional_snapshots(
             if index % snapshot_every == 0:
                 render_package(normalize_report, output_dir=package_dir, progress=None)
                 reporter.stage(
-                    "Update package snapshot",
-                    detail=f"{index}/{len(records)} nodes rendered into {package_dir}",
+                    "Update map and indexes",
+                    detail=f"{index}/{len(records)} normalized nodes rendered into {package_dir}",
                 )
 
     return normalize_report

@@ -32,3 +32,4 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - terminal progress bars and stage loaders for live discovery and live build workflows
 - progressive package snapshots during `build-live`, so `map` and indexes update while normalization advances
 - bounded concurrent live fetch with configurable `--concurrency` and `--fetch-concurrency` controls
+- aggregate `build-live` progress tracking across discover, fetch, extract, normalize, render, validate, and audit
