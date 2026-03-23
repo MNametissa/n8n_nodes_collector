@@ -11,6 +11,14 @@ DISCOVERY_SEED_URLS = [
     f"{OFFICIAL_DOCS_BASE}/integrations/",
 ]
 
+DISCOVERY_LIBRARY_URLS = [
+    f"{OFFICIAL_DOCS_BASE}/integrations/builtin/app-nodes/",
+    f"{OFFICIAL_DOCS_BASE}/integrations/builtin/core-nodes/",
+    f"{OFFICIAL_DOCS_BASE}/integrations/builtin/trigger-nodes/",
+    f"{OFFICIAL_DOCS_BASE}/integrations/builtin/cluster-nodes/root-nodes/",
+    f"{OFFICIAL_DOCS_BASE}/integrations/builtin/cluster-nodes/sub-nodes/",
+]
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CACHE_ROOT = REPO_ROOT / ".cache" / "n8n-nodes"
 RAW_CACHE_DIR = CACHE_ROOT / "raw"
@@ -25,4 +33,3 @@ LIBRARY_PATH_HINTS = {
     "root-nodes",
     "sub-nodes",
 }
-

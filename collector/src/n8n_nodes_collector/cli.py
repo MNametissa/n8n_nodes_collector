@@ -7,7 +7,7 @@ from pathlib import Path
 
 import typer
 
-from .discovery import discover_from_directory
+from .discovery import discover_from_directory, discover_from_live_sources
 from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
 from .models import DiscoveryReport, ExtractionReport, FetchReport, NormalizeReport
@@ -27,6 +27,18 @@ def discover(
     """Discover built-in node pages from local HTML pages."""
 
     report = discover_from_directory(input_dir)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report.as_sorted_payload(), indent=2) + "\n", encoding="utf-8")
+    typer.echo(f"Wrote {output}")
+
+
+@app.command("discover-live")
+def discover_live(
+    output: Path = typer.Option(..., "--output", "-o", help="Path to write the discovery report."),
+) -> None:
+    """Discover built-in node pages from the official live n8n docs navigation."""
+
+    report = discover_from_live_sources()
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report.as_sorted_payload(), indent=2) + "\n", encoding="utf-8")
     typer.echo(f"Wrote {output}")
