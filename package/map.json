@@ -1,0 +1,114 @@
+[
+  {
+    "id": "n8n.action.google-sheets",
+    "slug": "google-sheets",
+    "display_name": "Google Sheets #",
+    "family": "action",
+    "category_path": [
+      "actions",
+      "google-sheets"
+    ],
+    "service": "Google Sheets #",
+    "doc_url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/",
+    "file_md": "nodes/actions/google-sheets/node.md",
+    "file_json": "nodes/actions/google-sheets/node.json",
+    "tags": [],
+    "capabilities": [],
+    "related_nodes": [],
+    "requires_credentials": false,
+    "supports_tools_connector": false,
+    "has_common_issues_page": true,
+    "has_templates_section": false,
+    "status": "active"
+  },
+  {
+    "id": "n8n.cluster-root.ai-agent-node",
+    "slug": "ai-agent-node",
+    "display_name": "AI Agent node #",
+    "family": "cluster_root",
+    "category_path": [
+      "cluster",
+      "root",
+      "ai-agent-node"
+    ],
+    "service": "n8n AI",
+    "doc_url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/",
+    "file_md": "nodes/cluster/root/ai-agent-node/node.md",
+    "file_json": "nodes/cluster/root/ai-agent-node/node.json",
+    "tags": [],
+    "capabilities": [],
+    "related_nodes": [],
+    "requires_credentials": false,
+    "supports_tools_connector": true,
+    "has_common_issues_page": true,
+    "has_templates_section": false,
+    "status": "active"
+  },
+  {
+    "id": "n8n.cluster-sub.openai-chat-model-node",
+    "slug": "openai-chat-model-node",
+    "display_name": "OpenAI Chat Model node #",
+    "family": "cluster_sub",
+    "category_path": [
+      "cluster",
+      "sub",
+      "openai-chat-model-node"
+    ],
+    "service": "n8n AI",
+    "doc_url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.lmchatopenai/",
+    "file_md": "nodes/cluster/sub/openai-chat-model-node/node.md",
+    "file_json": "nodes/cluster/sub/openai-chat-model-node/node.json",
+    "tags": [],
+    "capabilities": [],
+    "related_nodes": [],
+    "requires_credentials": false,
+    "supports_tools_connector": false,
+    "has_common_issues_page": true,
+    "has_templates_section": false,
+    "status": "active"
+  },
+  {
+    "id": "n8n.core.code-node",
+    "slug": "code-node",
+    "display_name": "Code node #",
+    "family": "core",
+    "category_path": [
+      "core",
+      "code-node"
+    ],
+    "service": null,
+    "doc_url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.code/",
+    "file_md": "nodes/core/code-node/node.md",
+    "file_json": "nodes/core/code-node/node.json",
+    "tags": [],
+    "capabilities": [],
+    "related_nodes": [],
+    "requires_credentials": false,
+    "supports_tools_connector": false,
+    "has_common_issues_page": true,
+    "has_templates_section": false,
+    "status": "active"
+  },
+  {
+    "id": "n8n.trigger.schedule-trigger-node",
+    "slug": "schedule-trigger-node",
+    "display_name": "Schedule Trigger node #",
+    "family": "trigger",
+    "category_path": [
+      "triggers",
+      "schedule-trigger-node"
+    ],
+    "service": null,
+    "doc_url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger/",
+    "file_md": "nodes/triggers/schedule-trigger-node/node.md",
+    "file_json": "nodes/triggers/schedule-trigger-node/node.json",
+    "tags": [],
+    "capabilities": [],
+    "related_nodes": [],
+    "requires_credentials": false,
+    "supports_tools_connector": false,
+    "has_common_issues_page": true,
+    "has_templates_section": false,
+    "status": "active"
+  }
+]

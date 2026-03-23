@@ -1,0 +1,9 @@
+{
+  "Google Sheets #": [
+    "n8n.action.google-sheets"
+  ],
+  "n8n AI": [
+    "n8n.cluster-root.ai-agent-node",
+    "n8n.cluster-sub.openai-chat-model-node"
+  ]
+}

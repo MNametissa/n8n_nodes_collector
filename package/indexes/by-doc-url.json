@@ -1,0 +1,7 @@
+{
+  "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/": "n8n.action.google-sheets",
+  "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/": "n8n.cluster-root.ai-agent-node",
+  "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.lmchatopenai/": "n8n.cluster-sub.openai-chat-model-node",
+  "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.code/": "n8n.core.code-node",
+  "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger/": "n8n.trigger.schedule-trigger-node"
+}

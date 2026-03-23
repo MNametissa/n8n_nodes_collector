@@ -1,0 +1,15 @@
+{
+  "families": [
+    "core",
+    "action",
+    "trigger",
+    "cluster_root",
+    "cluster_sub"
+  ],
+  "views": [
+    "service",
+    "capability",
+    "type",
+    "category"
+  ]
+}

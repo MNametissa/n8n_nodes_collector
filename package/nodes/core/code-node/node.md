@@ -1,0 +1,1330 @@
+# Code node #
+
+## Identity
+- ID: `n8n.core.code-node`
+- Family: `core`
+- Service: `null`
+
+## Summary
+Using n8n Using n8n Getting started Getting started Learning path Choose your n8n Quickstarts Quickstarts A very quick quickstart A longer introduction Video courses Text courses Text courses Level one Level one Navigating the editor UI Building a mini-workflow Automating a (real-world) use case Designing the workflow Building the workflow Building the workflow Getting data from the data warehouse Inserting data into airtable Filtering orders Setting values for processing orders Calculating booked orders Notifying the team Scheduling the workflow Activating and examining the workflow Exporting and importing workflows Test your knowledge Level two Level two Understanding the data structure Processing different data types Merging and splitting data Dealing with errors in workflows Automating a business workflow Automating a business workflow Use case Workflow 1 Workflow 2 Workflow 3 Test your knowledge Using the app Using the app Understand workflows Understand workflows Create and run Save and publish Components Components Nodes Connections Sticky Notes Executions Executions Manual, partial, and production executions Dirty nodes Workflow-level executions All executions Custom executions data Debug executions Tags Export and import Templates Sharing Settings Streaming responses Workflow history Workflow ID Sub-workflow conversion Manage credentials Manage credentials Create and edit Credential sharing Manage users and access Manage users and access Cloud setup Manage users Account types Role-based access control Role-based access control Role types Projects Custom roles Best practices 2FA LDAP OIDC OIDC Set up OIDC Troubleshooting SAML SAML Set up SAML Okta Workforce Identity SAML setup Azure AD SAML setup Manage users with SAML Troubleshooting Keyboard shortcuts Key concepts Key concepts Flow logic Flow logic Splitting with conditionals Merging data Looping Waiting Sub-workflows Error handling Execution order in multi-branch workflows Working with data Working with data How n8n structures data Expressions versus data nodes Referencing data Referencing data Referencing data in the UI Referencing previous nodes Linking data items Linking data items How items link through workflows Accessing linked items in the Code node Preserving linking in the Code node Item linking errors Item linking for node creators Transforming data Transforming data Approaches for transforming data Expressions for data transformation Expression reference Expression reference Array BinaryFile Boolean CustomData Date DateTime ExecData HTTPResponse Item NodeInputData NodeOutputData Number Object PrevNodeData Root String WorkflowData Filtering data Pinning and mocking data Specific data types Specific data types Binary data Date and time with Luxon Query JSON with JMESPath Data tables Glossary n8n Cloud n8n Cloud Overview Cloud free trial Access the Cloud admin dashboard Update your n8n Cloud version Set the timezone Cloud IP addresses Cloud data management Change ownership or username Concurrency Download workflows AI Assistant Enterprise features Enterprise features Source control and environments Source control and environments Understand Understand Environments Git in n8n Branch patterns Set up Using Using Push and pull Compare workflow changes Copy work between environments Tutorial: Create environments with source control External secrets Log streaming Security settings Insights License key Releases Releases Release notes Release notes 2.x 1.x 0.x v2.0 breaking changes v2.0 Migration tool v1.0 migration guide Help and community Help and community Where to get help Contributing Licenses and privacy Licenses and privacy Privacy and security Privacy and security Privacy Security Incident response What you can do Sustainable use license
+
+## When To Use
+- Not present in source.
+
+## When Not To Use
+- Not present in source.
+
+## Credentials
+- Required: `false`
+- Notes: Not present in source.
+
+## Operations Or Parameters
+- Not present in source.
+
+## Inputs And Outputs
+Inputs:
+- Not present in source.
+Outputs:
+- Not present in source.
+
+## Common Issues
+- Using n8n Using n8n Getting started Getting started Learning path Choose your n8n Quickstarts Quickstarts A very quick quickstart A longer introduction Video courses Text courses Text courses Level one Level one Navigating the editor UI Building a mini-workflow Automating a (real-world) use case Designing the workflow Building the workflow Building the workflow Getting data from the data warehouse Inserting data into airtable Filtering orders Setting values for processing orders Calculating booked orders Notifying the team Scheduling the workflow Activating and examining the workflow Exporting and importing workflows Test your knowledge Level two Level two Understanding the data structure Processing different data types Merging and splitting data Dealing with errors in workflows Automating a business workflow Automating a business workflow Use case Workflow 1 Workflow 2 Workflow 3 Test your knowledge Using the app Using the app Understand workflows Understand workflows Create and run Save and publish Components Components Nodes Connections Sticky Notes Executions Executions Manual, partial, and production executions Dirty nodes Workflow-level executions All executions Custom executions data Debug executions Tags Export and import Templates Sharing Settings Streaming responses Workflow history Workflow ID Sub-workflow conversion Manage credentials Manage credentials Create and edit Credential sharing Manage users and access Manage users and access Cloud setup Manage users Account types Role-based access control Role-based access control Role types Projects Custom roles Best practices 2FA LDAP OIDC OIDC Set up OIDC Troubleshooting SAML SAML Set up SAML Okta Workforce Identity SAML setup Azure AD SAML setup Manage users with SAML Troubleshooting Keyboard shortcuts Key concepts Key concepts Flow logic Flow logic Splitting with conditionals Merging data Looping Waiting Sub-workflows Error handling Execution order in multi-branch workflows Working with data Working with data How n8n structures data Expressions versus data nodes Referencing data Referencing data Referencing data in the UI Referencing previous nodes Linking data items Linking data items How items link through workflows Accessing linked items in the Code node Preserving linking in the Code node Item linking errors Item linking for node creators Transforming data Transforming data Approaches for transforming data Expressions for data transformation Expression reference Expression reference Array BinaryFile Boolean CustomData Date DateTime ExecData HTTPResponse Item NodeInputData NodeOutputData Number Object PrevNodeData Root String WorkflowData Filtering data Pinning and mocking data Specific data types Specific data types Binary data Date and time with Luxon Query JSON with JMESPath Data tables Glossary n8n Cloud n8n Cloud Overview Cloud free trial Access the Cloud admin dashboard Update your n8n Cloud version Set the timezone Cloud IP addresses Cloud data management Change ownership or username Concurrency Download workflows AI Assistant Enterprise features Enterprise features Source control and environments Source control and environments Understand Understand Environments Git in n8n Branch patterns Set up Using Using Push and pull Compare workflow changes Copy work between environments Tutorial: Create environments with source control External secrets Log streaming Security settings Insights License key Releases Releases Release notes Release notes 2.x 1.x 0.x v2.0 breaking changes v2.0 Migration tool v1.0 migration guide Help and community Help and community Where to get help Contributing Licenses and privacy Licenses and privacy Privacy and security Privacy and security Privacy Security Incident response What you can do Sustainable use license
+- Getting started Getting started Learning path Choose your n8n Quickstarts Quickstarts A very quick quickstart A longer introduction Video courses Text courses Text courses Level one Level one Navigating the editor UI Building a mini-workflow Automating a (real-world) use case Designing the workflow Building the workflow Building the workflow Getting data from the data warehouse Inserting data into airtable Filtering orders Setting values for processing orders Calculating booked orders Notifying the team Scheduling the workflow Activating and examining the workflow Exporting and importing workflows Test your knowledge Level two Level two Understanding the data structure Processing different data types Merging and splitting data Dealing with errors in workflows Automating a business workflow Automating a business workflow Use case Workflow 1 Workflow 2 Workflow 3 Test your knowledge
+- Learning path
+- Choose your n8n
+- Quickstarts Quickstarts A very quick quickstart A longer introduction
+- A very quick quickstart
+- A longer introduction
+- Video courses
+- Text courses Text courses Level one Level one Navigating the editor UI Building a mini-workflow Automating a (real-world) use case Designing the workflow Building the workflow Building the workflow Getting data from the data warehouse Inserting data into airtable Filtering orders Setting values for processing orders Calculating booked orders Notifying the team Scheduling the workflow Activating and examining the workflow Exporting and importing workflows Test your knowledge Level two Level two Understanding the data structure Processing different data types Merging and splitting data Dealing with errors in workflows Automating a business workflow Automating a business workflow Use case Workflow 1 Workflow 2 Workflow 3 Test your knowledge
+- Level one Level one Navigating the editor UI Building a mini-workflow Automating a (real-world) use case Designing the workflow Building the workflow Building the workflow Getting data from the data warehouse Inserting data into airtable Filtering orders Setting values for processing orders Calculating booked orders Notifying the team Scheduling the workflow Activating and examining the workflow Exporting and importing workflows Test your knowledge
+- Navigating the editor UI
+- Building a mini-workflow
+- Automating a (real-world) use case
+- Designing the workflow
+- Building the workflow Building the workflow Getting data from the data warehouse Inserting data into airtable Filtering orders Setting values for processing orders Calculating booked orders Notifying the team Scheduling the workflow Activating and examining the workflow
+- Getting data from the data warehouse
+- Inserting data into airtable
+- Filtering orders
+- Setting values for processing orders
+- Calculating booked orders
+- Notifying the team
+- Scheduling the workflow
+- Activating and examining the workflow
+- Exporting and importing workflows
+- Test your knowledge
+- Level two Level two Understanding the data structure Processing different data types Merging and splitting data Dealing with errors in workflows Automating a business workflow Automating a business workflow Use case Workflow 1 Workflow 2 Workflow 3 Test your knowledge
+- Understanding the data structure
+- Processing different data types
+- Merging and splitting data
+- Dealing with errors in workflows
+- Automating a business workflow Automating a business workflow Use case Workflow 1 Workflow 2 Workflow 3
+- Use case
+- Workflow 1
+- Workflow 2
+- Workflow 3
+- Using the app Using the app Understand workflows Understand workflows Create and run Save and publish Components Components Nodes Connections Sticky Notes Executions Executions Manual, partial, and production executions Dirty nodes Workflow-level executions All executions Custom executions data Debug executions Tags Export and import Templates Sharing Settings Streaming responses Workflow history Workflow ID Sub-workflow conversion Manage credentials Manage credentials Create and edit Credential sharing Manage users and access Manage users and access Cloud setup Manage users Account types Role-based access control Role-based access control Role types Projects Custom roles Best practices 2FA LDAP OIDC OIDC Set up OIDC Troubleshooting SAML SAML Set up SAML Okta Workforce Identity SAML setup Azure AD SAML setup Manage users with SAML Troubleshooting Keyboard shortcuts
+- Understand workflows Understand workflows Create and run Save and publish Components Components Nodes Connections Sticky Notes Executions Executions Manual, partial, and production executions Dirty nodes Workflow-level executions All executions Custom executions data Debug executions Tags Export and import Templates Sharing Settings Streaming responses Workflow history Workflow ID Sub-workflow conversion
+- Create and run
+- Save and publish
+- Components Components Nodes Connections Sticky Notes
+- Nodes
+- Connections
+- Sticky Notes
+- Executions Executions Manual, partial, and production executions Dirty nodes Workflow-level executions All executions Custom executions data Debug executions
+- Manual, partial, and production executions
+- Dirty nodes
+- Workflow-level executions
+- All executions
+- Custom executions data
+- Debug executions
+- Tags
+- Export and import
+- Templates
+- Sharing
+- Settings
+- Streaming responses
+- Workflow history
+- Workflow ID
+- Sub-workflow conversion
+- Manage credentials Manage credentials Create and edit Credential sharing
+- Create and edit
+- Credential sharing
+- Manage users and access Manage users and access Cloud setup Manage users Account types Role-based access control Role-based access control Role types Projects Custom roles Best practices 2FA LDAP OIDC OIDC Set up OIDC Troubleshooting SAML SAML Set up SAML Okta Workforce Identity SAML setup Azure AD SAML setup Manage users with SAML Troubleshooting
+- Cloud setup
+- Manage users
+- Account types
+- Role-based access control Role-based access control Role types Projects Custom roles
+- Role types
+- Projects
+- Custom roles
+- Best practices
+- 2FA
+- LDAP
+- OIDC OIDC Set up OIDC Troubleshooting
+- Set up OIDC
+- Troubleshooting
+- SAML SAML Set up SAML Okta Workforce Identity SAML setup Azure AD SAML setup Manage users with SAML Troubleshooting
+- Set up SAML
+- Okta Workforce Identity SAML setup
+- Azure AD SAML setup
+- Manage users with SAML
+- Keyboard shortcuts
+- Key concepts Key concepts Flow logic Flow logic Splitting with conditionals Merging data Looping Waiting Sub-workflows Error handling Execution order in multi-branch workflows Working with data Working with data How n8n structures data Expressions versus data nodes Referencing data Referencing data Referencing data in the UI Referencing previous nodes Linking data items Linking data items How items link through workflows Accessing linked items in the Code node Preserving linking in the Code node Item linking errors Item linking for node creators Transforming data Transforming data Approaches for transforming data Expressions for data transformation Expression reference Expression reference Array BinaryFile Boolean CustomData Date DateTime ExecData HTTPResponse Item NodeInputData NodeOutputData Number Object PrevNodeData Root String WorkflowData Filtering data Pinning and mocking data Specific data types Specific data types Binary data Date and time with Luxon Query JSON with JMESPath Data tables Glossary
+- Flow logic Flow logic Splitting with conditionals Merging data Looping Waiting Sub-workflows Error handling Execution order in multi-branch workflows
+- Splitting with conditionals
+- Merging data
+- Looping
+- Waiting
+- Sub-workflows
+- Error handling
+- Execution order in multi-branch workflows
+- Working with data Working with data How n8n structures data Expressions versus data nodes Referencing data Referencing data Referencing data in the UI Referencing previous nodes Linking data items Linking data items How items link through workflows Accessing linked items in the Code node Preserving linking in the Code node Item linking errors Item linking for node creators Transforming data Transforming data Approaches for transforming data Expressions for data transformation Expression reference Expression reference Array BinaryFile Boolean CustomData Date DateTime ExecData HTTPResponse Item NodeInputData NodeOutputData Number Object PrevNodeData Root String WorkflowData Filtering data Pinning and mocking data Specific data types Specific data types Binary data Date and time with Luxon Query JSON with JMESPath Data tables
+- How n8n structures data
+- Expressions versus data nodes
+- Referencing data Referencing data Referencing data in the UI Referencing previous nodes Linking data items Linking data items How items link through workflows Accessing linked items in the Code node Preserving linking in the Code node Item linking errors Item linking for node creators
+- Referencing data in the UI
+- Referencing previous nodes
+- Linking data items Linking data items How items link through workflows Accessing linked items in the Code node Preserving linking in the Code node Item linking errors Item linking for node creators
+- How items link through workflows
+- Accessing linked items in the Code node
+- Preserving linking in the Code node
+- Item linking errors
+- Item linking for node creators
+- Transforming data Transforming data Approaches for transforming data Expressions for data transformation Expression reference Expression reference Array BinaryFile Boolean CustomData Date DateTime ExecData HTTPResponse Item NodeInputData NodeOutputData Number Object PrevNodeData Root String WorkflowData
+- Approaches for transforming data
+- Expressions for data transformation
+- Expression reference Expression reference Array BinaryFile Boolean CustomData Date DateTime ExecData HTTPResponse Item NodeInputData NodeOutputData Number Object PrevNodeData Root String WorkflowData
+- Array
+- BinaryFile
+- Boolean
+- CustomData
+- Date
+- DateTime
+- ExecData
+- HTTPResponse
+- Item
+- NodeInputData
+- NodeOutputData
+- Number
+- Object
+- PrevNodeData
+- Root
+- String
+- WorkflowData
+- Filtering data
+- Pinning and mocking data
+- Specific data types Specific data types Binary data Date and time with Luxon Query JSON with JMESPath
+- Binary data
+- Date and time with Luxon
+- Query JSON with JMESPath
+- Data tables
+- Glossary
+- n8n Cloud n8n Cloud Overview Cloud free trial Access the Cloud admin dashboard Update your n8n Cloud version Set the timezone Cloud IP addresses Cloud data management Change ownership or username Concurrency Download workflows AI Assistant
+- Overview
+- Cloud free trial
+- Access the Cloud admin dashboard
+- Update your n8n Cloud version
+- Set the timezone
+- Cloud IP addresses
+- Cloud data management
+- Change ownership or username
+- Concurrency
+- Download workflows
+- AI Assistant
+- Enterprise features Enterprise features Source control and environments Source control and environments Understand Understand Environments Git in n8n Branch patterns Set up Using Using Push and pull Compare workflow changes Copy work between environments Tutorial: Create environments with source control External secrets Log streaming Security settings Insights License key
+- Source control and environments Source control and environments Understand Understand Environments Git in n8n Branch patterns Set up Using Using Push and pull Compare workflow changes Copy work between environments Tutorial: Create environments with source control
+- Understand Understand Environments Git in n8n Branch patterns
+- Environments
+- Git in n8n
+- Branch patterns
+- Set up
+- Using Using Push and pull Compare workflow changes Copy work between environments
+- Push and pull
+- Compare workflow changes
+- Copy work between environments
+- Tutorial: Create environments with source control
+- External secrets
+- Log streaming
+- Security settings
+- Insights
+- License key
+- Releases Releases Release notes Release notes 2.x 1.x 0.x v2.0 breaking changes v2.0 Migration tool v1.0 migration guide
+- Release notes Release notes 2.x 1.x 0.x
+- 2.x
+- 1.x
+- 0.x
+- v2.0 breaking changes
+- v2.0 Migration tool
+- v1.0 migration guide
+- Help and community Help and community Where to get help Contributing
+- Where to get help
+- Contributing
+- Licenses and privacy Licenses and privacy Privacy and security Privacy and security Privacy Security Incident response What you can do Sustainable use license
+- Privacy and security Privacy and security Privacy Security Incident response What you can do
+- Privacy
+- Security
+- Incident response
+- What you can do
+- Sustainable use license
+- Integrations Integrations Built-in nodes Built-in nodes Node types Core nodes Core nodes Activation Trigger Aggregate AI Transform Code Code Keyboard shortcuts Common issues Common issues Table of contents Code doesn't return items properly A 'json' property isn't an object Code doesn't return an object 'import' and 'export' may only appear at the top level Cannot find module '<module>' Using global variables Can't access credentials in a code node Compare Datasets Compression Chat Trigger Chat Trigger Common issues Convert to File Crypto Data Table Data Table Row operations Table operations Date & Time Debug Helper Edit Fields (Set) Edit Image Email Trigger (IMAP) Error Trigger Evaluation Evaluation Trigger Execute Command Execute Command Common issues Execute Sub-workflow Execute Sub-workflow Trigger Execution Data Extract From File Filter FTP Git GraphQL Guardrails HTML HTTP Request HTTP Request Common issues If JWT LDAP Limit Local File Trigger Loop Over Items (Split in Batches) Manual Trigger Markdown MCP Client MCP Server Trigger Merge n8n n8n Form n8n Form Trigger n8n Trigger No Operation, do nothing Read/Write Files from Disk Remove Duplicates Remove Duplicates Templates and examples Rename Keys Chat Respond to Webhook RSS Read RSS Feed Trigger Schedule Trigger Schedule Trigger Common issues Send Email Sort Split Out SSE Trigger SSH Stop And Error Summarize Switch TOTP Wait Webhook Webhook Workflow development Common issues Workflow Trigger XML Actions Actions Action Network ActiveCampaign Adalo Affinity Agile CRM Airtable Airtable Common issues Airtop AMQP Sender Anthropic APITemplate.io Asana Autopilot AWS Certificate Manager AWS Cognito AWS Comprehend AWS DynamoDB AWS Elastic Load Balancing AWS IAM AWS Lambda AWS Rekognition AWS S3 AWS SES AWS SNS AWS SQS AWS Textract AWS Transcribe Azure Cosmos DB Azure Storage BambooHR Bannerbear Baserow Beeminder Bitly Bitwarden Box Brandfetch Brevo Bubble Chargebee CircleCI Webex by Cisco Clearbit ClickUp Clockify Cloudflare Cockpit Coda CoinGecko Contentful ConvertKit Copper Cortex CrateDB crowd.dev Customer.io DeepL Demio DHL Discord Discord Common issues Discourse Disqus Drift Dropbox Dropcontact E-goi Elasticsearch Elastic Security Emelia ERPNext Facebook Graph API FileMaker Flow Freshdesk Freshservice Freshworks CRM GetResponse Ghost GitHub GitLab Gmail Gmail Draft operations Label operations Message operations Thread operations Common issues Gong Google Ads Google Analytics Google BigQuery Google Books Google Business Profile Google Calendar Google Calendar Calendar operations Event operations Google Chat Google Cloud Firestore Google Cloud Natural Language Google Cloud Realtime Database Google Cloud Storage Google Contacts Google Docs Google Drive Google Drive File operations File and folder operations Folder operations Shared drive operations Common issues Google Gemini Google Perspective Google Sheets Google Sheets Document operations Sheet within Document operations Common issues Google Slides Google Tasks Google Translate Google Workspace Admin Gotify GoToWebinar Grafana Grist Hacker News HaloPSA Harvest Help Scout HighLevel Home Assistant HubSpot Humantic AI Hunter Intercom Invoice Ninja Iterable Jenkins Jina AI Jira Software Kafka Keap Kitemaker KoboToolbox Lemlist Line Linear LingvaNex LinkedIn LoneScale Magento 2 Mailcheck Mailchimp MailerLite Mailgun Mailjet Mandrill marketstack Matrix Mattermost Mautic Medium MessageBird Metabase Microsoft Dynamics CRM Microsoft Entra ID Microsoft Excel 365 Microsoft Graph Security Microsoft OneDrive Microsoft Outlook Microsoft SharePoint Microsoft SQL Microsoft Teams Microsoft To Do Mindee MISP Mistral AI Mocean monday.com MongoDB Monica CRM MQTT MSG91 MySQL MySQL Common issues Customer Datastore (n8n Training) Customer Messenger (n8n Training) NASA Netlify Netscaler ADC Nextcloud NocoDB Notion Notion Common issues npm Odoo Okta One Simple API Onfleet OpenAI OpenAI Assistant operations Audio operations Conversation operations File operations Image operations Text operations Video operations Common issues OpenThesaurus OpenWeatherMap Oracle Database Oracle Database Oura Paddle PagerDuty PayPal Peekalink Perplexity PhantomBuster Philips Hue Pipedrive Plivo PostBin Postgres Postgres Common issues PostHog ProfitWell Pushbullet Pushcut Pushover QuestDB Quick Base QuickBooks Online QuickChart RabbitMQ Raindrop Reddit Redis Rocket.Chat Rundeck S3 Salesforce Salesmate SeaTable SecurityScorecard Segment SendGrid Sendy Sentry.io ServiceNow seven Shopify SIGNL4 Slack Snowflake Splunk Spotify Stackby Storyblok Strapi Strava Stripe Supabase Supabase Common issues SyncroMSP Taiga Tapfiliate Telegram Telegram Chat operations Callback operations File operations Message operations Common issues TheHive TheHive 5 TimescaleDB Todoist Travis CI Trello Twake Twilio Twist Unleashed Software UpLead uProc UptimeRobot urlscan.io Venafi TLS Protect Cloud Venafi TLS Protect Datacenter Vero Vonage Webflow Wekan WhatsApp Business Cloud WhatsApp Business Cloud Common issues Wise WooCommerce WordPress X (Formerly Twitter) Xero Yourls YouTube Zammad Zendesk Zoho CRM Zoom Zulip Triggers Triggers ActiveCampaign Trigger Acuity Scheduling Trigger Affinity Trigger Airtable Trigger AMQP Trigger Asana Trigger Autopilot Trigger AWS SNS Trigger Bitbucket Trigger Box Trigger Brevo Trigger Calendly Trigger Cal Trigger Chargebee Trigger ClickUp Trigger Clockify Trigger ConvertKit Trigger Copper Trigger crowd.dev Trigger Customer.io Trigger Emelia Trigger Eventbrite Trigger Facebook Lead Ads Trigger Facebook Trigger Facebook Trigger Ad Account Application Certificate Transparency Group Instagram Link Page Permissions User WhatsApp Business Account Workplace Security Figma Trigger (Beta) Flow Trigger Form.io Trigger Formstack Trigger GetResponse Trigger GitHub Trigger GitLab Trigger Gmail Trigger Gmail Trigger Poll Mode options Common issues Google Calendar Trigger Google Drive Trigger Google Drive Trigger Common issues Google Business Profile Trigger Google Sheets Trigger Google Sheets Trigger Common issues Gumroad Trigger Help Scout Trigger Hubspot Trigger Invoice Ninja Trigger Jira Trigger Jotform Trigger Kafka Trigger Keap Trigger KoboToolbox Trigger Lemlist Trigger Linear Trigger LoneScale Trigger Mailchimp Trigger MailerLite Trigger Mailjet Trigger Mautic Trigger Microsoft OneDrive Trigger Microsoft Outlook Trigger Microsoft Teams Trigger MQTT Trigger Netlify Trigger Notion Trigger Onfleet Trigger PayPal Trigger Pipedrive Trigger Postgres Trigger Postmark Trigger Pushcut Trigger RabbitMQ Trigger Redis Trigger Salesforce Trigger SeaTable Trigger Shopify Trigger Slack Trigger Strava Trigger Stripe Trigger SurveyMonkey Trigger Taiga Trigger Telegram Trigger Telegram Trigger Common issues TheHive 5 Trigger TheHive Trigger Toggl Trigger Trello Trigger Twilio Trigger Typeform Trigger Venafi TLS Protect Cloud Trigger Webex by Cisco Trigger Webflow Trigger WhatsApp Trigger Wise Trigger WooCommerce Trigger Workable Trigger Wufoo Trigger Zendesk Trigger Cluster nodes Cluster nodes Root nodes Root nodes AI Agent AI Agent Conversational Agent OpenAI Functions Agent Plan and Execute Agent ReAct Agent SQL Agent Tools Agent Common issues Basic LLM Chain Question and Answer Chain Question and Answer Chain Common issues Summarization Chain Information Extractor Text Classifier Sentiment Analysis LangChain Code Microsoft Agent 365 Trigger Azure AI Search Vector Store Simple Vector Store Milvus Vector Store MongoDB Atlas Vector Store PGVector Vector Store Chroma Vector Store Pinecone Vector Store Qdrant Vector Store Redis Vector Store Supabase Vector Store Weaviate Vector Store Zep Vector Store Sub-nodes Sub-nodes Default Data Loader GitHub Document Loader Embeddings AWS Bedrock Embeddings Azure OpenAI Embeddings Cohere Embeddings Google Gemini Embeddings Google PaLM Embeddings Google Vertex Embeddings HuggingFace Inference Embeddings Mistral Cloud Embeddings Ollama Embeddings OpenAI Anthropic Chat Model AWS Bedrock Chat Model Azure OpenAI Chat Model Cohere Chat Model DeepSeek Chat Model Google Gemini Chat Model Google Vertex Chat Model Groq Chat Model Mistral Cloud Chat Model Ollama Chat Model Ollama Chat Model Common issues OpenAI Chat Model OpenAI Chat Model Common issues OpenRouter Chat Model Vercel AI Gateway Chat Model xAI Grok Chat Model Cohere Model Ollama Model Ollama Model Common issues Hugging Face Inference Model Chat Memory Manager Simple Memory Simple Memory Common issues Motorhead MongoDB Chat Memory Redis Chat Memory Postgres Chat Memory Xata Zep Auto-fixing Output Parser Item List Output Parser Structured Output Parser Structured Output Parser Common issues Contextual Compression Retriever MultiQuery Retriever Vector Store Retriever Workflow Retriever Character Text Splitter Recursive Character Text Splitter Token Splitter AI Agent Tool Calculator Custom Code Tool MCP Client Tool SearXNG Tool SerpApi (Google Search) Think Tool Vector Store Question Answer Tool Wikipedia Wolfram|Alpha Call n8n Workflow Tool Reranker Cohere Model Selector Credentials Credentials Action Network credentials ActiveCampaign credentials Acuity Scheduling credentials Adalo credentials Affinity credentials Agile CRM credentials Airtable credentials Airtop credentials AlienVault credentials AMQP credentials Anthropic credentials APITemplate.io credentials Asana credentials Auth0 Management credentials Autopilot credentials AWS credentials Azure OpenAI credentials Azure Cosmos DB credentials Azure AI Search credentials Azure Storage credentials BambooHR credentials Bannerbear credentials Baserow credentials Beeminder credentials Bitbucket credentials Bitly credentials Bitwarden credentials Box credentials Brandfetch credentials Brevo credentials Bubble credentials Cal.com credentials Calendly credentials Carbon Black credentials Chargebee credentials CircleCI credentials Cisco Meraki credentials Cisco Secure Endpoint credentials Cisco Umbrella credentials Clearbit credentials ClickUp credentials Clockify credentials Cloudflare credentials Cockpit credentials Coda credentials Cohere credentials Contentful credentials ConvertAPI credentials ConvertKit credentials Copper credentials Cortex credentials CrateDB credentials crowd.dev credentials CrowdStrike credentials Customer.io credentials Datadog credentials DeepL credentials DeepSeek credentials Demio credentials DFIR-IRIS credentials DHL credentials Discord credentials Discourse credentials Disqus credentials Drift credentials Dropbox credentials Dropcontact credentials Dynatrace credentials E-goi credentials Elasticsearch credentials Elastic Security credentials Emelia credentials ERPNext credentials Eventbrite credentials F5 Big-IP credentials Facebook App credentials Facebook Graph API credentials Facebook Lead Ads credentials Figma credentials FileMaker credentials Filescan credentials Flow credentials Form.io Trigger credentials Formstack Trigger credentials Fortinet FortiGate credentials Freshdesk credentials Freshservice credentials Freshworks CRM credentials FTP credentials GetResponse credentials Ghost credentials Git credentials GitHub credentials GitLab credentials Gong credentials Google Google Google OAuth2 single service Google OAuth2 generic Google Service Account Google Gemini(PaLM) credentials Gotify credentials GoToWebinar credentials Grafana credentials Grist credentials Groq credentials Gumroad credentials HaloPSA credentials Harvest credentials Help Scout credentials HighLevel credentials Home Assistant credentials HTTP Request credentials HubSpot credentials Hugging Face credentials Humantic AI credentials Hunter credentials Hybrid Analysis credentials IMAP IMAP Gmail Outlook.com Yahoo Imperva WAF credentials Intercom credentials Invoice Ninja credentials Iterable credentials Jenkins credentials Jina AI credentials Jira credentials Jotform credentials JWT credentials Kafka credentials Keap credentials Kibana credentials Kitemaker credentials KoboToolbox credentials LDAP credentials Lemlist credentials Line credentials Linear credentials LingvaNex credentials LinkedIn credentials LoneScale credentials Magento 2 credentials Mailcheck credentials Mailchimp credentials MailerLite credentials Mailgun credentials Mailjet credentials Malcore credentials Mandrill credentials Marketstack credentials Matrix credentials Mattermost credentials Mautic credentials Medium credentials MessageBird credentials Metabase credentials Microsoft credentials Microsoft Azure Monitor credentials Microsoft Entra ID credentials Microsoft SQL credentials Microsoft Agent 365 credentials Milvus credentials Mindee credentials Miro credentials MISP credentials Mist credentials Mistral Cloud credentials Mocean credentials monday.com credentials MongoDB credentials Monica CRM credentials Motorhead credentials MQTT credentials MSG91 credentials MySQL credentials NASA credentials Netlify credentials Netscaler ADC credentials Nextcloud credentials NocoDB credentials Notion credentials npm credentials Odoo credentials Okta credentials Ollama credentials One Simple API credentials Onfleet credentials OpenAI credentials OpenCTI credentials OpenRouter credentials OpenWeatherMap credentials Oracle Database credentials Oura credentials Paddle credentials PagerDuty credentials PayPal credentials Peekalink credentials Perplexity credentials PhantomBuster credentials Philips Hue credentials Chroma credentials Pinecone credentials Pipedrive credentials Plivo credentials Postgres credentials PostHog credentials Postmark credentials ProfitWell credentials Pushbullet credentials Pushcut credentials Pushover credentials QRadar credentials Qdrant credentials Qualys credentials QuestDB credentials Quick Base credentials QuickBooks credentials RabbitMQ credentials Raindrop credentials Rapid7 InsightVM credentials Recorded Future credentials Reddit credentials Redis credentials Rocket.Chat credentials Rundeck credentials S3 credentials Salesforce credentials Salesmate credentials SearXNG credentials SeaTable credentials SecurityScorecard credentials Segment credentials Sekoia credentials Send Email Send Email Gmail Outlook.com Yahoo SendGrid credentials Sendy credentials Sentry.io credentials Serp credentials ServiceNow credentials seven credentials Shopify credentials Shuffler credentials SIGNL4 credentials Slack credentials Snowflake credentials SolarWinds IPAM credentials SolarWinds Observability SaaS credentials Splunk credentials Spotify credentials SSH credentials Stackby credentials Storyblok credentials Strapi credentials Strava credentials Stripe credentials Supabase credentials SurveyMonkey credentials SyncroMSP credentials Sysdig credentials Taiga credentials Tapfiliate credentials Telegram credentials TheHive credentials TheHive 5 credentials TimescaleDB credentials Todoist credentials Toggl credentials TOTP credentials Travis CI credentials Trellix ePO credentials Trello credentials Twake credentials Twilio credentials Twist credentials Typeform credentials Unleashed Software credentials UpLead credentials uProc credentials UptimeRobot credentials urlscan.io credentials Venafi TLS Protect Cloud credentials Venafi TLS Protect Datacenter credentials Vercel AI Gateway credentials Vero credentials VirusTotal credentials Vonage credentials Weaviate credentials Webex by Cisco credentials Webflow credentials Webhook credentials Wekan credentials WhatsApp Business Cloud credentials Wise credentials Wolfram|Alpha credentials WooCommerce credentials WordPress credentials Workable credentials Wufoo credentials X (formerly Twitter) credentials xAI credentials Xata credentials Xero credentials Yourls credentials Zabbix credentials Zammad credentials Zendesk credentials Zep credentials Zoho credentials Zoom credentials Zscaler ZIA credentials Zulip credentials Custom API actions for existing nodes Handle rate limits Community nodes Community nodes Installation and management Installation and management Install verified community nodes GUI installation Manual installation Risks Blocklist Using community nodes Troubleshooting Building community nodes Creating nodes Creating nodes Overview Plan your node Plan your node Choose a node type Choose a node building style Node UI design Choose node file structure Build your node Build your node Set up your development environment Using the n8n-node tool Tutorial: Build a declarative-style node Tutorial: Build a programmatic-style node Reference Reference Node UI elements Code standards Error handling Versioning Choose node file structure Base files Base files Structure Standard parameters Declarative-style parameters Programmatic-style parameters Programmatic-style execute method Codex files Credentials files HTTP request helpers Item linking UX guidelines Verification guidelines Test your node Test your node Run your node locally Node linter Troubleshooting Deploy your node Deploy your node Submit community nodes Install private nodes
+- Built-in nodes Built-in nodes Node types Core nodes Core nodes Activation Trigger Aggregate AI Transform Code Code Keyboard shortcuts Common issues Common issues Table of contents Code doesn't return items properly A 'json' property isn't an object Code doesn't return an object 'import' and 'export' may only appear at the top level Cannot find module '<module>' Using global variables Can't access credentials in a code node Compare Datasets Compression Chat Trigger Chat Trigger Common issues Convert to File Crypto Data Table Data Table Row operations Table operations Date & Time Debug Helper Edit Fields (Set) Edit Image Email Trigger (IMAP) Error Trigger Evaluation Evaluation Trigger Execute Command Execute Command Common issues Execute Sub-workflow Execute Sub-workflow Trigger Execution Data Extract From File Filter FTP Git GraphQL Guardrails HTML HTTP Request HTTP Request Common issues If JWT LDAP Limit Local File Trigger Loop Over Items (Split in Batches) Manual Trigger Markdown MCP Client MCP Server Trigger Merge n8n n8n Form n8n Form Trigger n8n Trigger No Operation, do nothing Read/Write Files from Disk Remove Duplicates Remove Duplicates Templates and examples Rename Keys Chat Respond to Webhook RSS Read RSS Feed Trigger Schedule Trigger Schedule Trigger Common issues Send Email Sort Split Out SSE Trigger SSH Stop And Error Summarize Switch TOTP Wait Webhook Webhook Workflow development Common issues Workflow Trigger XML Actions Actions Action Network ActiveCampaign Adalo Affinity Agile CRM Airtable Airtable Common issues Airtop AMQP Sender Anthropic APITemplate.io Asana Autopilot AWS Certificate Manager AWS Cognito AWS Comprehend AWS DynamoDB AWS Elastic Load Balancing AWS IAM AWS Lambda AWS Rekognition AWS S3 AWS SES AWS SNS AWS SQS AWS Textract AWS Transcribe Azure Cosmos DB Azure Storage BambooHR Bannerbear Baserow Beeminder Bitly Bitwarden Box Brandfetch Brevo Bubble Chargebee CircleCI Webex by Cisco Clearbit ClickUp Clockify Cloudflare Cockpit Coda CoinGecko Contentful ConvertKit Copper Cortex CrateDB crowd.dev Customer.io DeepL Demio DHL Discord Discord Common issues Discourse Disqus Drift Dropbox Dropcontact E-goi Elasticsearch Elastic Security Emelia ERPNext Facebook Graph API FileMaker Flow Freshdesk Freshservice Freshworks CRM GetResponse Ghost GitHub GitLab Gmail Gmail Draft operations Label operations Message operations Thread operations Common issues Gong Google Ads Google Analytics Google BigQuery Google Books Google Business Profile Google Calendar Google Calendar Calendar operations Event operations Google Chat Google Cloud Firestore Google Cloud Natural Language Google Cloud Realtime Database Google Cloud Storage Google Contacts Google Docs Google Drive Google Drive File operations File and folder operations Folder operations Shared drive operations Common issues Google Gemini Google Perspective Google Sheets Google Sheets Document operations Sheet within Document operations Common issues Google Slides Google Tasks Google Translate Google Workspace Admin Gotify GoToWebinar Grafana Grist Hacker News HaloPSA Harvest Help Scout HighLevel Home Assistant HubSpot Humantic AI Hunter Intercom Invoice Ninja Iterable Jenkins Jina AI Jira Software Kafka Keap Kitemaker KoboToolbox Lemlist Line Linear LingvaNex LinkedIn LoneScale Magento 2 Mailcheck Mailchimp MailerLite Mailgun Mailjet Mandrill marketstack Matrix Mattermost Mautic Medium MessageBird Metabase Microsoft Dynamics CRM Microsoft Entra ID Microsoft Excel 365 Microsoft Graph Security Microsoft OneDrive Microsoft Outlook Microsoft SharePoint Microsoft SQL Microsoft Teams Microsoft To Do Mindee MISP Mistral AI Mocean monday.com MongoDB Monica CRM MQTT MSG91 MySQL MySQL Common issues Customer Datastore (n8n Training) Customer Messenger (n8n Training) NASA Netlify Netscaler ADC Nextcloud NocoDB Notion Notion Common issues npm Odoo Okta One Simple API Onfleet OpenAI OpenAI Assistant operations Audio operations Conversation operations File operations Image operations Text operations Video operations Common issues OpenThesaurus OpenWeatherMap Oracle Database Oracle Database Oura Paddle PagerDuty PayPal Peekalink Perplexity PhantomBuster Philips Hue Pipedrive Plivo PostBin Postgres Postgres Common issues PostHog ProfitWell Pushbullet Pushcut Pushover QuestDB Quick Base QuickBooks Online QuickChart RabbitMQ Raindrop Reddit Redis Rocket.Chat Rundeck S3 Salesforce Salesmate SeaTable SecurityScorecard Segment SendGrid Sendy Sentry.io ServiceNow seven Shopify SIGNL4 Slack Snowflake Splunk Spotify Stackby Storyblok Strapi Strava Stripe Supabase Supabase Common issues SyncroMSP Taiga Tapfiliate Telegram Telegram Chat operations Callback operations File operations Message operations Common issues TheHive TheHive 5 TimescaleDB Todoist Travis CI Trello Twake Twilio Twist Unleashed Software UpLead uProc UptimeRobot urlscan.io Venafi TLS Protect Cloud Venafi TLS Protect Datacenter Vero Vonage Webflow Wekan WhatsApp Business Cloud WhatsApp Business Cloud Common issues Wise WooCommerce WordPress X (Formerly Twitter) Xero Yourls YouTube Zammad Zendesk Zoho CRM Zoom Zulip Triggers Triggers ActiveCampaign Trigger Acuity Scheduling Trigger Affinity Trigger Airtable Trigger AMQP Trigger Asana Trigger Autopilot Trigger AWS SNS Trigger Bitbucket Trigger Box Trigger Brevo Trigger Calendly Trigger Cal Trigger Chargebee Trigger ClickUp Trigger Clockify Trigger ConvertKit Trigger Copper Trigger crowd.dev Trigger Customer.io Trigger Emelia Trigger Eventbrite Trigger Facebook Lead Ads Trigger Facebook Trigger Facebook Trigger Ad Account Application Certificate Transparency Group Instagram Link Page Permissions User WhatsApp Business Account Workplace Security Figma Trigger (Beta) Flow Trigger Form.io Trigger Formstack Trigger GetResponse Trigger GitHub Trigger GitLab Trigger Gmail Trigger Gmail Trigger Poll Mode options Common issues Google Calendar Trigger Google Drive Trigger Google Drive Trigger Common issues Google Business Profile Trigger Google Sheets Trigger Google Sheets Trigger Common issues Gumroad Trigger Help Scout Trigger Hubspot Trigger Invoice Ninja Trigger Jira Trigger Jotform Trigger Kafka Trigger Keap Trigger KoboToolbox Trigger Lemlist Trigger Linear Trigger LoneScale Trigger Mailchimp Trigger MailerLite Trigger Mailjet Trigger Mautic Trigger Microsoft OneDrive Trigger Microsoft Outlook Trigger Microsoft Teams Trigger MQTT Trigger Netlify Trigger Notion Trigger Onfleet Trigger PayPal Trigger Pipedrive Trigger Postgres Trigger Postmark Trigger Pushcut Trigger RabbitMQ Trigger Redis Trigger Salesforce Trigger SeaTable Trigger Shopify Trigger Slack Trigger Strava Trigger Stripe Trigger SurveyMonkey Trigger Taiga Trigger Telegram Trigger Telegram Trigger Common issues TheHive 5 Trigger TheHive Trigger Toggl Trigger Trello Trigger Twilio Trigger Typeform Trigger Venafi TLS Protect Cloud Trigger Webex by Cisco Trigger Webflow Trigger WhatsApp Trigger Wise Trigger WooCommerce Trigger Workable Trigger Wufoo Trigger Zendesk Trigger Cluster nodes Cluster nodes Root nodes Root nodes AI Agent AI Agent Conversational Agent OpenAI Functions Agent Plan and Execute Agent ReAct Agent SQL Agent Tools Agent Common issues Basic LLM Chain Question and Answer Chain Question and Answer Chain Common issues Summarization Chain Information Extractor Text Classifier Sentiment Analysis LangChain Code Microsoft Agent 365 Trigger Azure AI Search Vector Store Simple Vector Store Milvus Vector Store MongoDB Atlas Vector Store PGVector Vector Store Chroma Vector Store Pinecone Vector Store Qdrant Vector Store Redis Vector Store Supabase Vector Store Weaviate Vector Store Zep Vector Store Sub-nodes Sub-nodes Default Data Loader GitHub Document Loader Embeddings AWS Bedrock Embeddings Azure OpenAI Embeddings Cohere Embeddings Google Gemini Embeddings Google PaLM Embeddings Google Vertex Embeddings HuggingFace Inference Embeddings Mistral Cloud Embeddings Ollama Embeddings OpenAI Anthropic Chat Model AWS Bedrock Chat Model Azure OpenAI Chat Model Cohere Chat Model DeepSeek Chat Model Google Gemini Chat Model Google Vertex Chat Model Groq Chat Model Mistral Cloud Chat Model Ollama Chat Model Ollama Chat Model Common issues OpenAI Chat Model OpenAI Chat Model Common issues OpenRouter Chat Model Vercel AI Gateway Chat Model xAI Grok Chat Model Cohere Model Ollama Model Ollama Model Common issues Hugging Face Inference Model Chat Memory Manager Simple Memory Simple Memory Common issues Motorhead MongoDB Chat Memory Redis Chat Memory Postgres Chat Memory Xata Zep Auto-fixing Output Parser Item List Output Parser Structured Output Parser Structured Output Parser Common issues Contextual Compression Retriever MultiQuery Retriever Vector Store Retriever Workflow Retriever Character Text Splitter Recursive Character Text Splitter Token Splitter AI Agent Tool Calculator Custom Code Tool MCP Client Tool SearXNG Tool SerpApi (Google Search) Think Tool Vector Store Question Answer Tool Wikipedia Wolfram|Alpha Call n8n Workflow Tool Reranker Cohere Model Selector Credentials Credentials Action Network credentials ActiveCampaign credentials Acuity Scheduling credentials Adalo credentials Affinity credentials Agile CRM credentials Airtable credentials Airtop credentials AlienVault credentials AMQP credentials Anthropic credentials APITemplate.io credentials Asana credentials Auth0 Management credentials Autopilot credentials AWS credentials Azure OpenAI credentials Azure Cosmos DB credentials Azure AI Search credentials Azure Storage credentials BambooHR credentials Bannerbear credentials Baserow credentials Beeminder credentials Bitbucket credentials Bitly credentials Bitwarden credentials Box credentials Brandfetch credentials Brevo credentials Bubble credentials Cal.com credentials Calendly credentials Carbon Black credentials Chargebee credentials CircleCI credentials Cisco Meraki credentials Cisco Secure Endpoint credentials Cisco Umbrella credentials Clearbit credentials ClickUp credentials Clockify credentials Cloudflare credentials Cockpit credentials Coda credentials Cohere credentials Contentful credentials ConvertAPI credentials ConvertKit credentials Copper credentials Cortex credentials CrateDB credentials crowd.dev credentials CrowdStrike credentials Customer.io credentials Datadog credentials DeepL credentials DeepSeek credentials Demio credentials DFIR-IRIS credentials DHL credentials Discord credentials Discourse credentials Disqus credentials Drift credentials Dropbox credentials Dropcontact credentials Dynatrace credentials E-goi credentials Elasticsearch credentials Elastic Security credentials Emelia credentials ERPNext credentials Eventbrite credentials F5 Big-IP credentials Facebook App credentials Facebook Graph API credentials Facebook Lead Ads credentials Figma credentials FileMaker credentials Filescan credentials Flow credentials Form.io Trigger credentials Formstack Trigger credentials Fortinet FortiGate credentials Freshdesk credentials Freshservice credentials Freshworks CRM credentials FTP credentials GetResponse credentials Ghost credentials Git credentials GitHub credentials GitLab credentials Gong credentials Google Google Google OAuth2 single service Google OAuth2 generic Google Service Account Google Gemini(PaLM) credentials Gotify credentials GoToWebinar credentials Grafana credentials Grist credentials Groq credentials Gumroad credentials HaloPSA credentials Harvest credentials Help Scout credentials HighLevel credentials Home Assistant credentials HTTP Request credentials HubSpot credentials Hugging Face credentials Humantic AI credentials Hunter credentials Hybrid Analysis credentials IMAP IMAP Gmail Outlook.com Yahoo Imperva WAF credentials Intercom credentials Invoice Ninja credentials Iterable credentials Jenkins credentials Jina AI credentials Jira credentials Jotform credentials JWT credentials Kafka credentials Keap credentials Kibana credentials Kitemaker credentials KoboToolbox credentials LDAP credentials Lemlist credentials Line credentials Linear credentials LingvaNex credentials LinkedIn credentials LoneScale credentials Magento 2 credentials Mailcheck credentials Mailchimp credentials MailerLite credentials Mailgun credentials Mailjet credentials Malcore credentials Mandrill credentials Marketstack credentials Matrix credentials Mattermost credentials Mautic credentials Medium credentials MessageBird credentials Metabase credentials Microsoft credentials Microsoft Azure Monitor credentials Microsoft Entra ID credentials Microsoft SQL credentials Microsoft Agent 365 credentials Milvus credentials Mindee credentials Miro credentials MISP credentials Mist credentials Mistral Cloud credentials Mocean credentials monday.com credentials MongoDB credentials Monica CRM credentials Motorhead credentials MQTT credentials MSG91 credentials MySQL credentials NASA credentials Netlify credentials Netscaler ADC credentials Nextcloud credentials NocoDB credentials Notion credentials npm credentials Odoo credentials Okta credentials Ollama credentials One Simple API credentials Onfleet credentials OpenAI credentials OpenCTI credentials OpenRouter credentials OpenWeatherMap credentials Oracle Database credentials Oura credentials Paddle credentials PagerDuty credentials PayPal credentials Peekalink credentials Perplexity credentials PhantomBuster credentials Philips Hue credentials Chroma credentials Pinecone credentials Pipedrive credentials Plivo credentials Postgres credentials PostHog credentials Postmark credentials ProfitWell credentials Pushbullet credentials Pushcut credentials Pushover credentials QRadar credentials Qdrant credentials Qualys credentials QuestDB credentials Quick Base credentials QuickBooks credentials RabbitMQ credentials Raindrop credentials Rapid7 InsightVM credentials Recorded Future credentials Reddit credentials Redis credentials Rocket.Chat credentials Rundeck credentials S3 credentials Salesforce credentials Salesmate credentials SearXNG credentials SeaTable credentials SecurityScorecard credentials Segment credentials Sekoia credentials Send Email Send Email Gmail Outlook.com Yahoo SendGrid credentials Sendy credentials Sentry.io credentials Serp credentials ServiceNow credentials seven credentials Shopify credentials Shuffler credentials SIGNL4 credentials Slack credentials Snowflake credentials SolarWinds IPAM credentials SolarWinds Observability SaaS credentials Splunk credentials Spotify credentials SSH credentials Stackby credentials Storyblok credentials Strapi credentials Strava credentials Stripe credentials Supabase credentials SurveyMonkey credentials SyncroMSP credentials Sysdig credentials Taiga credentials Tapfiliate credentials Telegram credentials TheHive credentials TheHive 5 credentials TimescaleDB credentials Todoist credentials Toggl credentials TOTP credentials Travis CI credentials Trellix ePO credentials Trello credentials Twake credentials Twilio credentials Twist credentials Typeform credentials Unleashed Software credentials UpLead credentials uProc credentials UptimeRobot credentials urlscan.io credentials Venafi TLS Protect Cloud credentials Venafi TLS Protect Datacenter credentials Vercel AI Gateway credentials Vero credentials VirusTotal credentials Vonage credentials Weaviate credentials Webex by Cisco credentials Webflow credentials Webhook credentials Wekan credentials WhatsApp Business Cloud credentials Wise credentials Wolfram|Alpha credentials WooCommerce credentials WordPress credentials Workable credentials Wufoo credentials X (formerly Twitter) credentials xAI credentials Xata credentials Xero credentials Yourls credentials Zabbix credentials Zammad credentials Zendesk credentials Zep credentials Zoho credentials Zoom credentials Zscaler ZIA credentials Zulip credentials Custom API actions for existing nodes Handle rate limits
+- Node types
+- Core nodes Core nodes Activation Trigger Aggregate AI Transform Code Code Keyboard shortcuts Common issues Common issues Table of contents Code doesn't return items properly A 'json' property isn't an object Code doesn't return an object 'import' and 'export' may only appear at the top level Cannot find module '<module>' Using global variables Can't access credentials in a code node Compare Datasets Compression Chat Trigger Chat Trigger Common issues Convert to File Crypto Data Table Data Table Row operations Table operations Date & Time Debug Helper Edit Fields (Set) Edit Image Email Trigger (IMAP) Error Trigger Evaluation Evaluation Trigger Execute Command Execute Command Common issues Execute Sub-workflow Execute Sub-workflow Trigger Execution Data Extract From File Filter FTP Git GraphQL Guardrails HTML HTTP Request HTTP Request Common issues If JWT LDAP Limit Local File Trigger Loop Over Items (Split in Batches) Manual Trigger Markdown MCP Client MCP Server Trigger Merge n8n n8n Form n8n Form Trigger n8n Trigger No Operation, do nothing Read/Write Files from Disk Remove Duplicates Remove Duplicates Templates and examples Rename Keys Chat Respond to Webhook RSS Read RSS Feed Trigger Schedule Trigger Schedule Trigger Common issues Send Email Sort Split Out SSE Trigger SSH Stop And Error Summarize Switch TOTP Wait Webhook Webhook Workflow development Common issues Workflow Trigger XML
+- Activation Trigger
+- Aggregate
+- AI Transform
+- Code Code Keyboard shortcuts Common issues Common issues Table of contents Code doesn't return items properly A 'json' property isn't an object Code doesn't return an object 'import' and 'export' may only appear at the top level Cannot find module '<module>' Using global variables Can't access credentials in a code node
+- Common issues Common issues Table of contents Code doesn't return items properly A 'json' property isn't an object Code doesn't return an object 'import' and 'export' may only appear at the top level Cannot find module '<module>' Using global variables Can't access credentials in a code node
+- Code doesn't return items properly
+- A 'json' property isn't an object
+- Code doesn't return an object
+- 'import' and 'export' may only appear at the top level
+- Cannot find module '<module>'
+- Using global variables
+- Can't access credentials in a code node
+- Compare Datasets
+- Compression
+- Chat Trigger Chat Trigger Common issues
+- Common issues
+- Convert to File
+- Crypto
+- Data Table Data Table Row operations Table operations
+- Row operations
+- Table operations
+- Date & Time
+- Debug Helper
+- Edit Fields (Set)
+- Edit Image
+- Email Trigger (IMAP)
+- Error Trigger
+- Evaluation
+- Evaluation Trigger
+- Execute Command Execute Command Common issues
+- Execute Sub-workflow
+- Execute Sub-workflow Trigger
+- Execution Data
+- Extract From File
+- Filter
+- FTP
+- Git
+- GraphQL
+- Guardrails
+- HTML
+- HTTP Request HTTP Request Common issues
+- If
+- JWT
+- Limit
+- Local File Trigger
+- Loop Over Items (Split in Batches)
+- Manual Trigger
+- Markdown
+- MCP Client
+- MCP Server Trigger
+- Merge
+- n8n
+- n8n Form
+- n8n Form Trigger
+- n8n Trigger
+- No Operation, do nothing
+- Read/Write Files from Disk
+- Remove Duplicates Remove Duplicates Templates and examples
+- Templates and examples
+- Rename Keys
+- Chat
+- Respond to Webhook
+- RSS Read
+- RSS Feed Trigger
+- Schedule Trigger Schedule Trigger Common issues
+- Send Email
+- Sort
+- Split Out
+- SSE Trigger
+- SSH
+- Stop And Error
+- Summarize
+- Switch
+- TOTP
+- Wait
+- Webhook Webhook Workflow development Common issues
+- Workflow development
+- Workflow Trigger
+- XML
+- Actions Actions Action Network ActiveCampaign Adalo Affinity Agile CRM Airtable Airtable Common issues Airtop AMQP Sender Anthropic APITemplate.io Asana Autopilot AWS Certificate Manager AWS Cognito AWS Comprehend AWS DynamoDB AWS Elastic Load Balancing AWS IAM AWS Lambda AWS Rekognition AWS S3 AWS SES AWS SNS AWS SQS AWS Textract AWS Transcribe Azure Cosmos DB Azure Storage BambooHR Bannerbear Baserow Beeminder Bitly Bitwarden Box Brandfetch Brevo Bubble Chargebee CircleCI Webex by Cisco Clearbit ClickUp Clockify Cloudflare Cockpit Coda CoinGecko Contentful ConvertKit Copper Cortex CrateDB crowd.dev Customer.io DeepL Demio DHL Discord Discord Common issues Discourse Disqus Drift Dropbox Dropcontact E-goi Elasticsearch Elastic Security Emelia ERPNext Facebook Graph API FileMaker Flow Freshdesk Freshservice Freshworks CRM GetResponse Ghost GitHub GitLab Gmail Gmail Draft operations Label operations Message operations Thread operations Common issues Gong Google Ads Google Analytics Google BigQuery Google Books Google Business Profile Google Calendar Google Calendar Calendar operations Event operations Google Chat Google Cloud Firestore Google Cloud Natural Language Google Cloud Realtime Database Google Cloud Storage Google Contacts Google Docs Google Drive Google Drive File operations File and folder operations Folder operations Shared drive operations Common issues Google Gemini Google Perspective Google Sheets Google Sheets Document operations Sheet within Document operations Common issues Google Slides Google Tasks Google Translate Google Workspace Admin Gotify GoToWebinar Grafana Grist Hacker News HaloPSA Harvest Help Scout HighLevel Home Assistant HubSpot Humantic AI Hunter Intercom Invoice Ninja Iterable Jenkins Jina AI Jira Software Kafka Keap Kitemaker KoboToolbox Lemlist Line Linear LingvaNex LinkedIn LoneScale Magento 2 Mailcheck Mailchimp MailerLite Mailgun Mailjet Mandrill marketstack Matrix Mattermost Mautic Medium MessageBird Metabase Microsoft Dynamics CRM Microsoft Entra ID Microsoft Excel 365 Microsoft Graph Security Microsoft OneDrive Microsoft Outlook Microsoft SharePoint Microsoft SQL Microsoft Teams Microsoft To Do Mindee MISP Mistral AI Mocean monday.com MongoDB Monica CRM MQTT MSG91 MySQL MySQL Common issues Customer Datastore (n8n Training) Customer Messenger (n8n Training) NASA Netlify Netscaler ADC Nextcloud NocoDB Notion Notion Common issues npm Odoo Okta One Simple API Onfleet OpenAI OpenAI Assistant operations Audio operations Conversation operations File operations Image operations Text operations Video operations Common issues OpenThesaurus OpenWeatherMap Oracle Database Oracle Database Oura Paddle PagerDuty PayPal Peekalink Perplexity PhantomBuster Philips Hue Pipedrive Plivo PostBin Postgres Postgres Common issues PostHog ProfitWell Pushbullet Pushcut Pushover QuestDB Quick Base QuickBooks Online QuickChart RabbitMQ Raindrop Reddit Redis Rocket.Chat Rundeck S3 Salesforce Salesmate SeaTable SecurityScorecard Segment SendGrid Sendy Sentry.io ServiceNow seven Shopify SIGNL4 Slack Snowflake Splunk Spotify Stackby Storyblok Strapi Strava Stripe Supabase Supabase Common issues SyncroMSP Taiga Tapfiliate Telegram Telegram Chat operations Callback operations File operations Message operations Common issues TheHive TheHive 5 TimescaleDB Todoist Travis CI Trello Twake Twilio Twist Unleashed Software UpLead uProc UptimeRobot urlscan.io Venafi TLS Protect Cloud Venafi TLS Protect Datacenter Vero Vonage Webflow Wekan WhatsApp Business Cloud WhatsApp Business Cloud Common issues Wise WooCommerce WordPress X (Formerly Twitter) Xero Yourls YouTube Zammad Zendesk Zoho CRM Zoom Zulip
+- Action Network
+- ActiveCampaign
+- Adalo
+- Affinity
+- Agile CRM
+- Airtable Airtable Common issues
+- Airtop
+- AMQP Sender
+- Anthropic
+- APITemplate.io
+- Asana
+- Autopilot
+- AWS Certificate Manager
+- AWS Cognito
+- AWS Comprehend
+- AWS DynamoDB
+- AWS Elastic Load Balancing
+- AWS IAM
+- AWS Lambda
+- AWS Rekognition
+- AWS S3
+- AWS SES
+- AWS SNS
+- AWS SQS
+- AWS Textract
+- AWS Transcribe
+- Azure Cosmos DB
+- Azure Storage
+- BambooHR
+- Bannerbear
+- Baserow
+- Beeminder
+- Bitly
+- Bitwarden
+- Box
+- Brandfetch
+- Brevo
+- Bubble
+- Chargebee
+- CircleCI
+- Webex by Cisco
+- Clearbit
+- ClickUp
+- Clockify
+- Cloudflare
+- Cockpit
+- Coda
+- CoinGecko
+- Contentful
+- ConvertKit
+- Copper
+- Cortex
+- CrateDB
+- crowd.dev
+- Customer.io
+- DeepL
+- Demio
+- DHL
+- Discord Discord Common issues
+- Discourse
+- Disqus
+- Drift
+- Dropbox
+- Dropcontact
+- E-goi
+- Elasticsearch
+- Elastic Security
+- Emelia
+- ERPNext
+- Facebook Graph API
+- FileMaker
+- Flow
+- Freshdesk
+- Freshservice
+- Freshworks CRM
+- GetResponse
+- Ghost
+- GitHub
+- GitLab
+- Gmail Gmail Draft operations Label operations Message operations Thread operations Common issues
+- Draft operations
+- Label operations
+- Message operations
+- Thread operations
+- Gong
+- Google Ads
+- Google Analytics
+- Google BigQuery
+- Google Books
+- Google Business Profile
+- Google Calendar Google Calendar Calendar operations Event operations
+- Calendar operations
+- Event operations
+- Google Chat
+- Google Cloud Firestore
+- Google Cloud Natural Language
+- Google Cloud Realtime Database
+- Google Cloud Storage
+- Google Contacts
+- Google Docs
+- Google Drive Google Drive File operations File and folder operations Folder operations Shared drive operations Common issues
+- File operations
+- File and folder operations
+- Folder operations
+- Shared drive operations
+- Google Gemini
+- Google Perspective
+- Google Sheets Google Sheets Document operations Sheet within Document operations Common issues
+- Document operations
+- Sheet within Document operations
+- Google Slides
+- Google Tasks
+- Google Translate
+- Google Workspace Admin
+- Gotify
+- GoToWebinar
+- Grafana
+- Grist
+- Hacker News
+- HaloPSA
+- Harvest
+- Help Scout
+- HighLevel
+- Home Assistant
+- HubSpot
+- Humantic AI
+- Hunter
+- Intercom
+- Invoice Ninja
+- Iterable
+- Jenkins
+- Jina AI
+- Jira Software
+- Kafka
+- Keap
+- Kitemaker
+- KoboToolbox
+- Lemlist
+- Line
+- Linear
+- LingvaNex
+- LinkedIn
+- LoneScale
+- Magento 2
+- Mailcheck
+- Mailchimp
+- MailerLite
+- Mailgun
+- Mailjet
+- Mandrill
+- marketstack
+- Matrix
+- Mattermost
+- Mautic
+- Medium
+- MessageBird
+- Metabase
+- Microsoft Dynamics CRM
+- Microsoft Entra ID
+- Microsoft Excel 365
+- Microsoft Graph Security
+- Microsoft OneDrive
+- Microsoft Outlook
+- Microsoft SharePoint
+- Microsoft SQL
+- Microsoft Teams
+- Microsoft To Do
+- Mindee
+- MISP
+- Mistral AI
+- Mocean
+- monday.com
+- MongoDB
+- Monica CRM
+- MQTT
+- MSG91
+- MySQL MySQL Common issues
+- Customer Datastore (n8n Training)
+- Customer Messenger (n8n Training)
+- NASA
+- Netlify
+- Netscaler ADC
+- Nextcloud
+- NocoDB
+- Notion Notion Common issues
+- npm
+- Odoo
+- Okta
+- One Simple API
+- Onfleet
+- OpenAI OpenAI Assistant operations Audio operations Conversation operations File operations Image operations Text operations Video operations Common issues
+- Assistant operations
+- Audio operations
+- Conversation operations
+- Image operations
+- Text operations
+- Video operations
+- OpenThesaurus
+- OpenWeatherMap
+- Oracle Database Oracle Database
+- Oura
+- Paddle
+- PagerDuty
+- PayPal
+- Peekalink
+- Perplexity
+- PhantomBuster
+- Philips Hue
+- Pipedrive
+- Plivo
+- PostBin
+- Postgres Postgres Common issues
+- PostHog
+- ProfitWell
+- Pushbullet
+- Pushcut
+- Pushover
+- QuestDB
+- Quick Base
+- QuickBooks Online
+- QuickChart
+- RabbitMQ
+- Raindrop
+- Reddit
+- Redis
+- Rocket.Chat
+- Rundeck
+- S3
+- Salesforce
+- Salesmate
+- SeaTable
+- SecurityScorecard
+- Segment
+- SendGrid
+- Sendy
+- Sentry.io
+- ServiceNow
+- seven
+- Shopify
+- SIGNL4
+- Slack
+- Snowflake
+- Splunk
+- Spotify
+- Stackby
+- Storyblok
+- Strapi
+- Strava
+- Stripe
+- Supabase Supabase Common issues
+- SyncroMSP
+- Taiga
+- Tapfiliate
+- Telegram Telegram Chat operations Callback operations File operations Message operations Common issues
+- Chat operations
+- Callback operations
+- TheHive
+- TheHive 5
+- TimescaleDB
+- Todoist
+- Travis CI
+- Trello
+- Twake
+- Twilio
+- Twist
+- Unleashed Software
+- UpLead
+- uProc
+- UptimeRobot
+- urlscan.io
+- Venafi TLS Protect Cloud
+- Venafi TLS Protect Datacenter
+- Vero
+- Vonage
+- Webflow
+- Wekan
+- WhatsApp Business Cloud WhatsApp Business Cloud Common issues
+- Wise
+- WooCommerce
+- WordPress
+- X (Formerly Twitter)
+- Xero
+- Yourls
+- YouTube
+- Zammad
+- Zendesk
+- Zoho CRM
+- Zoom
+- Zulip
+- Triggers Triggers ActiveCampaign Trigger Acuity Scheduling Trigger Affinity Trigger Airtable Trigger AMQP Trigger Asana Trigger Autopilot Trigger AWS SNS Trigger Bitbucket Trigger Box Trigger Brevo Trigger Calendly Trigger Cal Trigger Chargebee Trigger ClickUp Trigger Clockify Trigger ConvertKit Trigger Copper Trigger crowd.dev Trigger Customer.io Trigger Emelia Trigger Eventbrite Trigger Facebook Lead Ads Trigger Facebook Trigger Facebook Trigger Ad Account Application Certificate Transparency Group Instagram Link Page Permissions User WhatsApp Business Account Workplace Security Figma Trigger (Beta) Flow Trigger Form.io Trigger Formstack Trigger GetResponse Trigger GitHub Trigger GitLab Trigger Gmail Trigger Gmail Trigger Poll Mode options Common issues Google Calendar Trigger Google Drive Trigger Google Drive Trigger Common issues Google Business Profile Trigger Google Sheets Trigger Google Sheets Trigger Common issues Gumroad Trigger Help Scout Trigger Hubspot Trigger Invoice Ninja Trigger Jira Trigger Jotform Trigger Kafka Trigger Keap Trigger KoboToolbox Trigger Lemlist Trigger Linear Trigger LoneScale Trigger Mailchimp Trigger MailerLite Trigger Mailjet Trigger Mautic Trigger Microsoft OneDrive Trigger Microsoft Outlook Trigger Microsoft Teams Trigger MQTT Trigger Netlify Trigger Notion Trigger Onfleet Trigger PayPal Trigger Pipedrive Trigger Postgres Trigger Postmark Trigger Pushcut Trigger RabbitMQ Trigger Redis Trigger Salesforce Trigger SeaTable Trigger Shopify Trigger Slack Trigger Strava Trigger Stripe Trigger SurveyMonkey Trigger Taiga Trigger Telegram Trigger Telegram Trigger Common issues TheHive 5 Trigger TheHive Trigger Toggl Trigger Trello Trigger Twilio Trigger Typeform Trigger Venafi TLS Protect Cloud Trigger Webex by Cisco Trigger Webflow Trigger WhatsApp Trigger Wise Trigger WooCommerce Trigger Workable Trigger Wufoo Trigger Zendesk Trigger
+- ActiveCampaign Trigger
+- Acuity Scheduling Trigger
+- Affinity Trigger
+- Airtable Trigger
+- AMQP Trigger
+- Asana Trigger
+- Autopilot Trigger
+- AWS SNS Trigger
+- Bitbucket Trigger
+- Box Trigger
+- Brevo Trigger
+- Calendly Trigger
+- Cal Trigger
+- Chargebee Trigger
+- ClickUp Trigger
+- Clockify Trigger
+- ConvertKit Trigger
+- Copper Trigger
+- crowd.dev Trigger
+- Customer.io Trigger
+- Emelia Trigger
+- Eventbrite Trigger
+- Facebook Lead Ads Trigger
+- Facebook Trigger Facebook Trigger Ad Account Application Certificate Transparency Group Instagram Link Page Permissions User WhatsApp Business Account Workplace Security
+- Ad Account
+- Application
+- Certificate Transparency
+- Group
+- Instagram
+- Link
+- Page
+- Permissions
+- User
+- WhatsApp Business Account
+- Workplace Security
+- Figma Trigger (Beta)
+- Flow Trigger
+- Form.io Trigger
+- Formstack Trigger
+- GetResponse Trigger
+- GitHub Trigger
+- GitLab Trigger
+- Gmail Trigger Gmail Trigger Poll Mode options Common issues
+- Poll Mode options
+- Google Calendar Trigger
+- Google Drive Trigger Google Drive Trigger Common issues
+- Google Business Profile Trigger
+- Google Sheets Trigger Google Sheets Trigger Common issues
+- Gumroad Trigger
+- Help Scout Trigger
+- Hubspot Trigger
+- Invoice Ninja Trigger
+- Jira Trigger
+- Jotform Trigger
+- Kafka Trigger
+- Keap Trigger
+- KoboToolbox Trigger
+- Lemlist Trigger
+- Linear Trigger
+- LoneScale Trigger
+- Mailchimp Trigger
+- MailerLite Trigger
+- Mailjet Trigger
+- Mautic Trigger
+- Microsoft OneDrive Trigger
+- Microsoft Outlook Trigger
+- Microsoft Teams Trigger
+- MQTT Trigger
+- Netlify Trigger
+- Notion Trigger
+- Onfleet Trigger
+- PayPal Trigger
+- Pipedrive Trigger
+- Postgres Trigger
+- Postmark Trigger
+- Pushcut Trigger
+- RabbitMQ Trigger
+- Redis Trigger
+- Salesforce Trigger
+- SeaTable Trigger
+- Shopify Trigger
+- Slack Trigger
+- Strava Trigger
+- Stripe Trigger
+- SurveyMonkey Trigger
+- Taiga Trigger
+- Telegram Trigger Telegram Trigger Common issues
+- TheHive 5 Trigger
+- TheHive Trigger
+- Toggl Trigger
+- Trello Trigger
+- Twilio Trigger
+- Typeform Trigger
+- Venafi TLS Protect Cloud Trigger
+- Webex by Cisco Trigger
+- Webflow Trigger
+- WhatsApp Trigger
+- Wise Trigger
+- WooCommerce Trigger
+- Workable Trigger
+- Wufoo Trigger
+- Zendesk Trigger
+- Cluster nodes Cluster nodes Root nodes Root nodes AI Agent AI Agent Conversational Agent OpenAI Functions Agent Plan and Execute Agent ReAct Agent SQL Agent Tools Agent Common issues Basic LLM Chain Question and Answer Chain Question and Answer Chain Common issues Summarization Chain Information Extractor Text Classifier Sentiment Analysis LangChain Code Microsoft Agent 365 Trigger Azure AI Search Vector Store Simple Vector Store Milvus Vector Store MongoDB Atlas Vector Store PGVector Vector Store Chroma Vector Store Pinecone Vector Store Qdrant Vector Store Redis Vector Store Supabase Vector Store Weaviate Vector Store Zep Vector Store Sub-nodes Sub-nodes Default Data Loader GitHub Document Loader Embeddings AWS Bedrock Embeddings Azure OpenAI Embeddings Cohere Embeddings Google Gemini Embeddings Google PaLM Embeddings Google Vertex Embeddings HuggingFace Inference Embeddings Mistral Cloud Embeddings Ollama Embeddings OpenAI Anthropic Chat Model AWS Bedrock Chat Model Azure OpenAI Chat Model Cohere Chat Model DeepSeek Chat Model Google Gemini Chat Model Google Vertex Chat Model Groq Chat Model Mistral Cloud Chat Model Ollama Chat Model Ollama Chat Model Common issues OpenAI Chat Model OpenAI Chat Model Common issues OpenRouter Chat Model Vercel AI Gateway Chat Model xAI Grok Chat Model Cohere Model Ollama Model Ollama Model Common issues Hugging Face Inference Model Chat Memory Manager Simple Memory Simple Memory Common issues Motorhead MongoDB Chat Memory Redis Chat Memory Postgres Chat Memory Xata Zep Auto-fixing Output Parser Item List Output Parser Structured Output Parser Structured Output Parser Common issues Contextual Compression Retriever MultiQuery Retriever Vector Store Retriever Workflow Retriever Character Text Splitter Recursive Character Text Splitter Token Splitter AI Agent Tool Calculator Custom Code Tool MCP Client Tool SearXNG Tool SerpApi (Google Search) Think Tool Vector Store Question Answer Tool Wikipedia Wolfram|Alpha Call n8n Workflow Tool Reranker Cohere Model Selector
+- Root nodes Root nodes AI Agent AI Agent Conversational Agent OpenAI Functions Agent Plan and Execute Agent ReAct Agent SQL Agent Tools Agent Common issues Basic LLM Chain Question and Answer Chain Question and Answer Chain Common issues Summarization Chain Information Extractor Text Classifier Sentiment Analysis LangChain Code Microsoft Agent 365 Trigger Azure AI Search Vector Store Simple Vector Store Milvus Vector Store MongoDB Atlas Vector Store PGVector Vector Store Chroma Vector Store Pinecone Vector Store Qdrant Vector Store Redis Vector Store Supabase Vector Store Weaviate Vector Store Zep Vector Store
+- AI Agent AI Agent Conversational Agent OpenAI Functions Agent Plan and Execute Agent ReAct Agent SQL Agent Tools Agent Common issues
+- Conversational Agent
+- OpenAI Functions Agent
+- Plan and Execute Agent
+- ReAct Agent
+- SQL Agent
+- Tools Agent
+- Basic LLM Chain
+- Question and Answer Chain Question and Answer Chain Common issues
+- Summarization Chain
+- Information Extractor
+- Text Classifier
+- Sentiment Analysis
+- LangChain Code
+- Microsoft Agent 365 Trigger
+- Azure AI Search Vector Store
+- Simple Vector Store
+- Milvus Vector Store
+- MongoDB Atlas Vector Store
+- PGVector Vector Store
+- Chroma Vector Store
+- Pinecone Vector Store
+- Qdrant Vector Store
+- Redis Vector Store
+- Supabase Vector Store
+- Weaviate Vector Store
+- Zep Vector Store
+- Sub-nodes Sub-nodes Default Data Loader GitHub Document Loader Embeddings AWS Bedrock Embeddings Azure OpenAI Embeddings Cohere Embeddings Google Gemini Embeddings Google PaLM Embeddings Google Vertex Embeddings HuggingFace Inference Embeddings Mistral Cloud Embeddings Ollama Embeddings OpenAI Anthropic Chat Model AWS Bedrock Chat Model Azure OpenAI Chat Model Cohere Chat Model DeepSeek Chat Model Google Gemini Chat Model Google Vertex Chat Model Groq Chat Model Mistral Cloud Chat Model Ollama Chat Model Ollama Chat Model Common issues OpenAI Chat Model OpenAI Chat Model Common issues OpenRouter Chat Model Vercel AI Gateway Chat Model xAI Grok Chat Model Cohere Model Ollama Model Ollama Model Common issues Hugging Face Inference Model Chat Memory Manager Simple Memory Simple Memory Common issues Motorhead MongoDB Chat Memory Redis Chat Memory Postgres Chat Memory Xata Zep Auto-fixing Output Parser Item List Output Parser Structured Output Parser Structured Output Parser Common issues Contextual Compression Retriever MultiQuery Retriever Vector Store Retriever Workflow Retriever Character Text Splitter Recursive Character Text Splitter Token Splitter AI Agent Tool Calculator Custom Code Tool MCP Client Tool SearXNG Tool SerpApi (Google Search) Think Tool Vector Store Question Answer Tool Wikipedia Wolfram|Alpha Call n8n Workflow Tool Reranker Cohere Model Selector
+- Default Data Loader
+- GitHub Document Loader
+- Embeddings AWS Bedrock
+- Embeddings Azure OpenAI
+- Embeddings Cohere
+- Embeddings Google Gemini
+- Embeddings Google PaLM
+- Embeddings Google Vertex
+- Embeddings HuggingFace Inference
+- Embeddings Mistral Cloud
+- Embeddings Ollama
+- Embeddings OpenAI
+- Anthropic Chat Model
+- AWS Bedrock Chat Model
+- Azure OpenAI Chat Model
+- Cohere Chat Model
+- DeepSeek Chat Model
+- Google Gemini Chat Model
+- Google Vertex Chat Model
+- Groq Chat Model
+- Mistral Cloud Chat Model
+- Ollama Chat Model Ollama Chat Model Common issues
+- OpenAI Chat Model OpenAI Chat Model Common issues
+- OpenRouter Chat Model
+- Vercel AI Gateway Chat Model
+- xAI Grok Chat Model
+- Cohere Model
+- Ollama Model Ollama Model Common issues
+- Hugging Face Inference Model
+- Chat Memory Manager
+- Simple Memory Simple Memory Common issues
+- Motorhead
+- MongoDB Chat Memory
+- Redis Chat Memory
+- Postgres Chat Memory
+- Xata
+- Zep
+- Auto-fixing Output Parser
+- Item List Output Parser
+- Structured Output Parser Structured Output Parser Common issues
+- Contextual Compression Retriever
+- MultiQuery Retriever
+- Vector Store Retriever
+- Workflow Retriever
+- Character Text Splitter
+- Recursive Character Text Splitter
+- Token Splitter
+- AI Agent Tool
+- Calculator
+- Custom Code Tool
+- MCP Client Tool
+- SearXNG Tool
+- SerpApi (Google Search)
+- Think Tool
+- Vector Store Question Answer Tool
+- Wikipedia
+- Wolfram|Alpha
+- Call n8n Workflow Tool
+- Reranker Cohere
+- Model Selector
+- Credentials Credentials Action Network credentials ActiveCampaign credentials Acuity Scheduling credentials Adalo credentials Affinity credentials Agile CRM credentials Airtable credentials Airtop credentials AlienVault credentials AMQP credentials Anthropic credentials APITemplate.io credentials Asana credentials Auth0 Management credentials Autopilot credentials AWS credentials Azure OpenAI credentials Azure Cosmos DB credentials Azure AI Search credentials Azure Storage credentials BambooHR credentials Bannerbear credentials Baserow credentials Beeminder credentials Bitbucket credentials Bitly credentials Bitwarden credentials Box credentials Brandfetch credentials Brevo credentials Bubble credentials Cal.com credentials Calendly credentials Carbon Black credentials Chargebee credentials CircleCI credentials Cisco Meraki credentials Cisco Secure Endpoint credentials Cisco Umbrella credentials Clearbit credentials ClickUp credentials Clockify credentials Cloudflare credentials Cockpit credentials Coda credentials Cohere credentials Contentful credentials ConvertAPI credentials ConvertKit credentials Copper credentials Cortex credentials CrateDB credentials crowd.dev credentials CrowdStrike credentials Customer.io credentials Datadog credentials DeepL credentials DeepSeek credentials Demio credentials DFIR-IRIS credentials DHL credentials Discord credentials Discourse credentials Disqus credentials Drift credentials Dropbox credentials Dropcontact credentials Dynatrace credentials E-goi credentials Elasticsearch credentials Elastic Security credentials Emelia credentials ERPNext credentials Eventbrite credentials F5 Big-IP credentials Facebook App credentials Facebook Graph API credentials Facebook Lead Ads credentials Figma credentials FileMaker credentials Filescan credentials Flow credentials Form.io Trigger credentials Formstack Trigger credentials Fortinet FortiGate credentials Freshdesk credentials Freshservice credentials Freshworks CRM credentials FTP credentials GetResponse credentials Ghost credentials Git credentials GitHub credentials GitLab credentials Gong credentials Google Google Google OAuth2 single service Google OAuth2 generic Google Service Account Google Gemini(PaLM) credentials Gotify credentials GoToWebinar credentials Grafana credentials Grist credentials Groq credentials Gumroad credentials HaloPSA credentials Harvest credentials Help Scout credentials HighLevel credentials Home Assistant credentials HTTP Request credentials HubSpot credentials Hugging Face credentials Humantic AI credentials Hunter credentials Hybrid Analysis credentials IMAP IMAP Gmail Outlook.com Yahoo Imperva WAF credentials Intercom credentials Invoice Ninja credentials Iterable credentials Jenkins credentials Jina AI credentials Jira credentials Jotform credentials JWT credentials Kafka credentials Keap credentials Kibana credentials Kitemaker credentials KoboToolbox credentials LDAP credentials Lemlist credentials Line credentials Linear credentials LingvaNex credentials LinkedIn credentials LoneScale credentials Magento 2 credentials Mailcheck credentials Mailchimp credentials MailerLite credentials Mailgun credentials Mailjet credentials Malcore credentials Mandrill credentials Marketstack credentials Matrix credentials Mattermost credentials Mautic credentials Medium credentials MessageBird credentials Metabase credentials Microsoft credentials Microsoft Azure Monitor credentials Microsoft Entra ID credentials Microsoft SQL credentials Microsoft Agent 365 credentials Milvus credentials Mindee credentials Miro credentials MISP credentials Mist credentials Mistral Cloud credentials Mocean credentials monday.com credentials MongoDB credentials Monica CRM credentials Motorhead credentials MQTT credentials MSG91 credentials MySQL credentials NASA credentials Netlify credentials Netscaler ADC credentials Nextcloud credentials NocoDB credentials Notion credentials npm credentials Odoo credentials Okta credentials Ollama credentials One Simple API credentials Onfleet credentials OpenAI credentials OpenCTI credentials OpenRouter credentials OpenWeatherMap credentials Oracle Database credentials Oura credentials Paddle credentials PagerDuty credentials PayPal credentials Peekalink credentials Perplexity credentials PhantomBuster credentials Philips Hue credentials Chroma credentials Pinecone credentials Pipedrive credentials Plivo credentials Postgres credentials PostHog credentials Postmark credentials ProfitWell credentials Pushbullet credentials Pushcut credentials Pushover credentials QRadar credentials Qdrant credentials Qualys credentials QuestDB credentials Quick Base credentials QuickBooks credentials RabbitMQ credentials Raindrop credentials Rapid7 InsightVM credentials Recorded Future credentials Reddit credentials Redis credentials Rocket.Chat credentials Rundeck credentials S3 credentials Salesforce credentials Salesmate credentials SearXNG credentials SeaTable credentials SecurityScorecard credentials Segment credentials Sekoia credentials Send Email Send Email Gmail Outlook.com Yahoo SendGrid credentials Sendy credentials Sentry.io credentials Serp credentials ServiceNow credentials seven credentials Shopify credentials Shuffler credentials SIGNL4 credentials Slack credentials Snowflake credentials SolarWinds IPAM credentials SolarWinds Observability SaaS credentials Splunk credentials Spotify credentials SSH credentials Stackby credentials Storyblok credentials Strapi credentials Strava credentials Stripe credentials Supabase credentials SurveyMonkey credentials SyncroMSP credentials Sysdig credentials Taiga credentials Tapfiliate credentials Telegram credentials TheHive credentials TheHive 5 credentials TimescaleDB credentials Todoist credentials Toggl credentials TOTP credentials Travis CI credentials Trellix ePO credentials Trello credentials Twake credentials Twilio credentials Twist credentials Typeform credentials Unleashed Software credentials UpLead credentials uProc credentials UptimeRobot credentials urlscan.io credentials Venafi TLS Protect Cloud credentials Venafi TLS Protect Datacenter credentials Vercel AI Gateway credentials Vero credentials VirusTotal credentials Vonage credentials Weaviate credentials Webex by Cisco credentials Webflow credentials Webhook credentials Wekan credentials WhatsApp Business Cloud credentials Wise credentials Wolfram|Alpha credentials WooCommerce credentials WordPress credentials Workable credentials Wufoo credentials X (formerly Twitter) credentials xAI credentials Xata credentials Xero credentials Yourls credentials Zabbix credentials Zammad credentials Zendesk credentials Zep credentials Zoho credentials Zoom credentials Zscaler ZIA credentials Zulip credentials
+- Action Network credentials
+- ActiveCampaign credentials
+- Acuity Scheduling credentials
+- Adalo credentials
+- Affinity credentials
+- Agile CRM credentials
+- Airtable credentials
+- Airtop credentials
+- AlienVault credentials
+- AMQP credentials
+- Anthropic credentials
+- APITemplate.io credentials
+- Asana credentials
+- Auth0 Management credentials
+- Autopilot credentials
+- AWS credentials
+- Azure OpenAI credentials
+- Azure Cosmos DB credentials
+- Azure AI Search credentials
+- Azure Storage credentials
+- BambooHR credentials
+- Bannerbear credentials
+- Baserow credentials
+- Beeminder credentials
+- Bitbucket credentials
+- Bitly credentials
+- Bitwarden credentials
+- Box credentials
+- Brandfetch credentials
+- Brevo credentials
+- Bubble credentials
+- Cal.com credentials
+- Calendly credentials
+- Carbon Black credentials
+- Chargebee credentials
+- CircleCI credentials
+- Cisco Meraki credentials
+- Cisco Secure Endpoint credentials
+- Cisco Umbrella credentials
+- Clearbit credentials
+- ClickUp credentials
+- Clockify credentials
+- Cloudflare credentials
+- Cockpit credentials
+- Coda credentials
+- Cohere credentials
+- Contentful credentials
+- ConvertAPI credentials
+- ConvertKit credentials
+- Copper credentials
+- Cortex credentials
+- CrateDB credentials
+- crowd.dev credentials
+- CrowdStrike credentials
+- Customer.io credentials
+- Datadog credentials
+- DeepL credentials
+- DeepSeek credentials
+- Demio credentials
+- DFIR-IRIS credentials
+- DHL credentials
+- Discord credentials
+- Discourse credentials
+- Disqus credentials
+- Drift credentials
+- Dropbox credentials
+- Dropcontact credentials
+- Dynatrace credentials
+- E-goi credentials
+- Elasticsearch credentials
+- Elastic Security credentials
+- Emelia credentials
+- ERPNext credentials
+- Eventbrite credentials
+- F5 Big-IP credentials
+- Facebook App credentials
+- Facebook Graph API credentials
+- Facebook Lead Ads credentials
+- Figma credentials
+- FileMaker credentials
+- Filescan credentials
+- Flow credentials
+- Form.io Trigger credentials
+- Formstack Trigger credentials
+- Fortinet FortiGate credentials
+- Freshdesk credentials
+- Freshservice credentials
+- Freshworks CRM credentials
+- FTP credentials
+- GetResponse credentials
+- Ghost credentials
+- Git credentials
+- GitHub credentials
+- GitLab credentials
+- Gong credentials
+- Google Google Google OAuth2 single service Google OAuth2 generic Google Service Account
+- Google OAuth2 single service
+- Google OAuth2 generic
+- Google Service Account
+- Google Gemini(PaLM) credentials
+- Gotify credentials
+- GoToWebinar credentials
+- Grafana credentials
+- Grist credentials
+- Groq credentials
+- Gumroad credentials
+- HaloPSA credentials
+- Harvest credentials
+- Help Scout credentials
+- HighLevel credentials
+- Home Assistant credentials
+- HTTP Request credentials
+- HubSpot credentials
+- Hugging Face credentials
+- Humantic AI credentials
+- Hunter credentials
+- Hybrid Analysis credentials
+- IMAP IMAP Gmail Outlook.com Yahoo
+- Gmail
+- Outlook.com
+- Yahoo
+- Imperva WAF credentials
+- Intercom credentials
+- Invoice Ninja credentials
+- Iterable credentials
+- Jenkins credentials
+- Jina AI credentials
+- Jira credentials
+- Jotform credentials
+- JWT credentials
+- Kafka credentials
+- Keap credentials
+- Kibana credentials
+- Kitemaker credentials
+- KoboToolbox credentials
+- LDAP credentials
+- Lemlist credentials
+- Line credentials
+- Linear credentials
+- LingvaNex credentials
+- LinkedIn credentials
+- LoneScale credentials
+- Magento 2 credentials
+- Mailcheck credentials
+- Mailchimp credentials
+- MailerLite credentials
+- Mailgun credentials
+- Mailjet credentials
+- Malcore credentials
+- Mandrill credentials
+- Marketstack credentials
+- Matrix credentials
+- Mattermost credentials
+- Mautic credentials
+- Medium credentials
+- MessageBird credentials
+- Metabase credentials
+- Microsoft credentials
+- Microsoft Azure Monitor credentials
+- Microsoft Entra ID credentials
+- Microsoft SQL credentials
+- Microsoft Agent 365 credentials
+- Milvus credentials
+- Mindee credentials
+- Miro credentials
+- MISP credentials
+- Mist credentials
+- Mistral Cloud credentials
+- Mocean credentials
+- monday.com credentials
+- MongoDB credentials
+- Monica CRM credentials
+- Motorhead credentials
+- MQTT credentials
+- MSG91 credentials
+- MySQL credentials
+- NASA credentials
+- Netlify credentials
+- Netscaler ADC credentials
+- Nextcloud credentials
+- NocoDB credentials
+- Notion credentials
+- npm credentials
+- Odoo credentials
+- Okta credentials
+- Ollama credentials
+- One Simple API credentials
+- Onfleet credentials
+- OpenAI credentials
+- OpenCTI credentials
+- OpenRouter credentials
+- OpenWeatherMap credentials
+- Oracle Database credentials
+- Oura credentials
+- Paddle credentials
+- PagerDuty credentials
+- PayPal credentials
+- Peekalink credentials
+- Perplexity credentials
+- PhantomBuster credentials
+- Philips Hue credentials
+- Chroma credentials
+- Pinecone credentials
+- Pipedrive credentials
+- Plivo credentials
+- Postgres credentials
+- PostHog credentials
+- Postmark credentials
+- ProfitWell credentials
+- Pushbullet credentials
+- Pushcut credentials
+- Pushover credentials
+- QRadar credentials
+- Qdrant credentials
+- Qualys credentials
+- QuestDB credentials
+- Quick Base credentials
+- QuickBooks credentials
+- RabbitMQ credentials
+- Raindrop credentials
+- Rapid7 InsightVM credentials
+- Recorded Future credentials
+- Reddit credentials
+- Redis credentials
+- Rocket.Chat credentials
+- Rundeck credentials
+- S3 credentials
+- Salesforce credentials
+- Salesmate credentials
+- SearXNG credentials
+- SeaTable credentials
+- SecurityScorecard credentials
+- Segment credentials
+- Sekoia credentials
+- Send Email Send Email Gmail Outlook.com Yahoo
+- SendGrid credentials
+- Sendy credentials
+- Sentry.io credentials
+- Serp credentials
+- ServiceNow credentials
+- seven credentials
+- Shopify credentials
+- Shuffler credentials
+- SIGNL4 credentials
+- Slack credentials
+- Snowflake credentials
+- SolarWinds IPAM credentials
+- SolarWinds Observability SaaS credentials
+- Splunk credentials
+- Spotify credentials
+- SSH credentials
+- Stackby credentials
+- Storyblok credentials
+- Strapi credentials
+- Strava credentials
+- Stripe credentials
+- Supabase credentials
+- SurveyMonkey credentials
+- SyncroMSP credentials
+- Sysdig credentials
+- Taiga credentials
+- Tapfiliate credentials
+- Telegram credentials
+- TheHive credentials
+- TheHive 5 credentials
+- TimescaleDB credentials
+- Todoist credentials
+- Toggl credentials
+- TOTP credentials
+- Travis CI credentials
+- Trellix ePO credentials
+- Trello credentials
+- Twake credentials
+- Twilio credentials
+- Twist credentials
+- Typeform credentials
+- Unleashed Software credentials
+- UpLead credentials
+- uProc credentials
+- UptimeRobot credentials
+- urlscan.io credentials
+- Venafi TLS Protect Cloud credentials
+- Venafi TLS Protect Datacenter credentials
+- Vercel AI Gateway credentials
+- Vero credentials
+- VirusTotal credentials
+- Vonage credentials
+- Weaviate credentials
+- Webex by Cisco credentials
+- Webflow credentials
+- Webhook credentials
+- Wekan credentials
+- WhatsApp Business Cloud credentials
+- Wise credentials
+- Wolfram|Alpha credentials
+- WooCommerce credentials
+- WordPress credentials
+- Workable credentials
+- Wufoo credentials
+- X (formerly Twitter) credentials
+- xAI credentials
+- Xata credentials
+- Xero credentials
+- Yourls credentials
+- Zabbix credentials
+- Zammad credentials
+- Zendesk credentials
+- Zep credentials
+- Zoho credentials
+- Zoom credentials
+- Zscaler ZIA credentials
+- Zulip credentials
+- Custom API actions for existing nodes
+- Handle rate limits
+- Community nodes Community nodes Installation and management Installation and management Install verified community nodes GUI installation Manual installation Risks Blocklist Using community nodes Troubleshooting Building community nodes
+- Installation and management Installation and management Install verified community nodes GUI installation Manual installation
+- Install verified community nodes
+- GUI installation
+- Manual installation
+- Risks
+- Blocklist
+- Using community nodes
+- Building community nodes
+- Creating nodes Creating nodes Overview Plan your node Plan your node Choose a node type Choose a node building style Node UI design Choose node file structure Build your node Build your node Set up your development environment Using the n8n-node tool Tutorial: Build a declarative-style node Tutorial: Build a programmatic-style node Reference Reference Node UI elements Code standards Error handling Versioning Choose node file structure Base files Base files Structure Standard parameters Declarative-style parameters Programmatic-style parameters Programmatic-style execute method Codex files Credentials files HTTP request helpers Item linking UX guidelines Verification guidelines Test your node Test your node Run your node locally Node linter Troubleshooting Deploy your node Deploy your node Submit community nodes Install private nodes
+- Plan your node Plan your node Choose a node type Choose a node building style Node UI design Choose node file structure
+- Choose a node type
+- Choose a node building style
+- Node UI design
+- Choose node file structure
+- Build your node Build your node Set up your development environment Using the n8n-node tool Tutorial: Build a declarative-style node Tutorial: Build a programmatic-style node Reference Reference Node UI elements Code standards Error handling Versioning Choose node file structure Base files Base files Structure Standard parameters Declarative-style parameters Programmatic-style parameters Programmatic-style execute method Codex files Credentials files HTTP request helpers Item linking UX guidelines Verification guidelines
+- Set up your development environment
+- Using the n8n-node tool
+- Tutorial: Build a declarative-style node
+- Tutorial: Build a programmatic-style node
+- Reference Reference Node UI elements Code standards Error handling Versioning Choose node file structure Base files Base files Structure Standard parameters Declarative-style parameters Programmatic-style parameters Programmatic-style execute method Codex files Credentials files HTTP request helpers Item linking UX guidelines Verification guidelines
+- Node UI elements
+- Code standards
+- Versioning
+- Base files Base files Structure Standard parameters Declarative-style parameters Programmatic-style parameters Programmatic-style execute method
+- Structure
+- Standard parameters
+- Declarative-style parameters
+- Programmatic-style parameters
+- Programmatic-style execute method
+- Codex files
+- Credentials files
+- HTTP request helpers
+- Item linking
+- UX guidelines
+- Verification guidelines
+- Test your node Test your node Run your node locally Node linter Troubleshooting
+- Run your node locally
+- Node linter
+- Deploy your node Deploy your node Submit community nodes Install private nodes
+- Submit community nodes
+- Install private nodes
+- Hosting n8n Hosting n8n Community vs Enterprise Installation Installation npm Docker Server setups Server setups Digital Ocean Heroku Hetzner Amazon Web Services Azure Google Cloud Run Google Kubernetes Engine Docker Compose Updating Configuration Configuration Environment variables Environment variables AI Assistant Binary data Credentials Database Deployment Endpoints Executions External data storage External hooks External secrets Insights Logs License Nodes Queue mode Security SSRF protection Source control Task runners Timezone and localization User management and 2FA Workflows Workflow history Configuration methods Configuration examples Configuration examples Isolate n8n Configure the Base URL Configure custom SSL certificate authorities Set a custom encryption key Configure workflow timeouts Specify custom nodes location Enable modules in Code node Set the timezone Specify user folder path Configure webhook URLs with reverse proxy Enable Prometheus metrics Supported databases and settings Task runners User management Logging and monitoring Logging and monitoring Logging Monitoring Security audit Scaling and performance Scaling and performance Overview Performance and benchmarking Configuring queue mode Concurrency control Execution data Binary data External storage for binary data Memory-related errors Securing n8n Securing n8n Overview Set up SSL Set up SSO Security audit Disable the API Opt out of data collection Blocking nodes Hardening task runners SSRF protection Restrict account registration to email-verified users Starter Kits Starter Kits AI Starter Kit Architecture Architecture Overview Database structure Using the CLI Using the CLI CLI commands
+- Community vs Enterprise
+- Installation Installation npm Docker Server setups Server setups Digital Ocean Heroku Hetzner Amazon Web Services Azure Google Cloud Run Google Kubernetes Engine Docker Compose Updating
+- Docker
+- Server setups Server setups Digital Ocean Heroku Hetzner Amazon Web Services Azure Google Cloud Run Google Kubernetes Engine Docker Compose
+- Digital Ocean
+- Heroku
+- Hetzner
+- Amazon Web Services
+- Azure
+- Google Cloud Run
+- Google Kubernetes Engine
+- Docker Compose
+- Updating
+- Configuration Configuration Environment variables Environment variables AI Assistant Binary data Credentials Database Deployment Endpoints Executions External data storage External hooks External secrets Insights Logs License Nodes Queue mode Security SSRF protection Source control Task runners Timezone and localization User management and 2FA Workflows Workflow history Configuration methods Configuration examples Configuration examples Isolate n8n Configure the Base URL Configure custom SSL certificate authorities Set a custom encryption key Configure workflow timeouts Specify custom nodes location Enable modules in Code node Set the timezone Specify user folder path Configure webhook URLs with reverse proxy Enable Prometheus metrics Supported databases and settings Task runners User management
+- Environment variables Environment variables AI Assistant Binary data Credentials Database Deployment Endpoints Executions External data storage External hooks External secrets Insights Logs License Nodes Queue mode Security SSRF protection Source control Task runners Timezone and localization User management and 2FA Workflows Workflow history
+- Credentials
+- Database
+- Deployment
+- Endpoints
+- Executions
+- External data storage
+- External hooks
+- Logs
+- License
+- Queue mode
+- SSRF protection
+- Source control
+- Task runners
+- Timezone and localization
+- User management and 2FA
+- Workflows
+- Configuration methods
+- Configuration examples Configuration examples Isolate n8n Configure the Base URL Configure custom SSL certificate authorities Set a custom encryption key Configure workflow timeouts Specify custom nodes location Enable modules in Code node Set the timezone Specify user folder path Configure webhook URLs with reverse proxy Enable Prometheus metrics
+- Isolate n8n
+- Configure the Base URL
+- Configure custom SSL certificate authorities
+- Set a custom encryption key
+- Configure workflow timeouts
+- Specify custom nodes location
+- Enable modules in Code node
+- Specify user folder path
+- Configure webhook URLs with reverse proxy
+- Enable Prometheus metrics
+- Supported databases and settings
+- User management
+- Logging and monitoring Logging and monitoring Logging Monitoring Security audit
+- Logging
+- Monitoring
+- Security audit
+- Scaling and performance Scaling and performance Overview Performance and benchmarking Configuring queue mode Concurrency control Execution data Binary data External storage for binary data Memory-related errors
+- Performance and benchmarking
+- Configuring queue mode
+- Concurrency control
+- Execution data
+- External storage for binary data
+- Memory-related errors
+- Securing n8n Securing n8n Overview Set up SSL Set up SSO Security audit Disable the API Opt out of data collection Blocking nodes Hardening task runners SSRF protection Restrict account registration to email-verified users
+- Set up SSL
+- Set up SSO
+- Disable the API
+- Opt out of data collection
+- Blocking nodes
+- Hardening task runners
+- Restrict account registration to email-verified users
+- Starter Kits Starter Kits AI Starter Kit
+- AI Starter Kit
+- Architecture Architecture Overview Database structure
+- Database structure
+- Using the CLI Using the CLI CLI commands
+- CLI commands
+- Code in n8n Code in n8n Using the Code node AI coding Built in methods and variables Built in methods and variables Overview JMESPath HTTP node LangChain Code node n8n metadata Custom variables Custom variables Create custom variables Cookbook Cookbook Built-in methods and variables examples Built-in methods and variables examples execution getWorkflowStaticData (node-name).all vars Code node Code node Get number of items returned by last node Get the binary data buffer Output to the browser console HTTP Request node HTTP Request node Pagination
+- Using the Code node
+- AI coding
+- Built in methods and variables Built in methods and variables Overview JMESPath HTTP node LangChain Code node n8n metadata
+- JMESPath
+- HTTP node
+- LangChain Code node
+- n8n metadata
+- Custom variables Custom variables Create custom variables
+- Create custom variables
+- Cookbook Cookbook Built-in methods and variables examples Built-in methods and variables examples execution getWorkflowStaticData (node-name).all vars Code node Code node Get number of items returned by last node Get the binary data buffer Output to the browser console HTTP Request node HTTP Request node Pagination
+- Built-in methods and variables examples Built-in methods and variables examples execution getWorkflowStaticData (node-name).all vars
+- execution
+- getWorkflowStaticData
+- (node-name).all
+- vars
+- Code node Code node Get number of items returned by last node Get the binary data buffer Output to the browser console
+- Get number of items returned by last node
+- Get the binary data buffer
+- Output to the browser console
+- HTTP Request node HTTP Request node Pagination
+- Pagination
+- Advanced AI Advanced AI AI Workflow Builder Chat Hub Accessing n8n MCP server Tutorial: Build an AI workflow in n8n RAG in n8n LangChain in n8n LangChain in n8n Overview Langchain concepts in n8n LangChain learning resources Use LangSmith with n8n Evaluations Evaluations Overview Light evaluations Metric-based evaluations Tips and common issues Examples and concepts Examples and concepts Introduction What is a chain? What is an agent? Agents vs chains example What is memory? What is a tool? Use Google Sheets as a data source Call an API to fetch data Set a human fallback for AI workflows Human-in-the-loop for tool calls Let AI specify tool parameters What is a vector database? Populate a Pinecone vector database from a website
+- AI Workflow Builder
+- Chat Hub
+- Accessing n8n MCP server
+- Tutorial: Build an AI workflow in n8n
+- RAG in n8n
+- LangChain in n8n LangChain in n8n Overview Langchain concepts in n8n LangChain learning resources Use LangSmith with n8n
+- Langchain concepts in n8n
+- LangChain learning resources
+- Use LangSmith with n8n
+- Evaluations Evaluations Overview Light evaluations Metric-based evaluations Tips and common issues
+- Light evaluations
+- Metric-based evaluations
+- Tips and common issues
+- Examples and concepts Examples and concepts Introduction What is a chain? What is an agent? Agents vs chains example What is memory? What is a tool? Use Google Sheets as a data source Call an API to fetch data Set a human fallback for AI workflows Human-in-the-loop for tool calls Let AI specify tool parameters What is a vector database? Populate a Pinecone vector database from a website
+- Introduction
+- What is a chain?
+- What is an agent?
+- Agents vs chains example
+- What is memory?
+- What is a tool?
+- Use Google Sheets as a data source
+- Call an API to fetch data
+- Set a human fallback for AI workflows
+- Human-in-the-loop for tool calls
+- Let AI specify tool parameters
+- What is a vector database?
+- Populate a Pinecone vector database from a website
+- API API Authentication Pagination Using an API playground API reference
+- Authentication
+- Using an API playground
+- API reference
+- Embed Embed Prerequisites Deployment Configuration Workflow management Workflows templates White labelling
+- Prerequisites
+- Configuration
+- Workflow management
+- Workflows templates
+- White labelling
+- Integrations
+- Built-in nodes
+- Core nodes
+- Code
+- Here are some common errors and issues with the Code node and steps to resolve or troubleshoot them.
+- Code Doesn'T Return Items Properly #
+- This error occurs when the code in your Code node doesn't return data in the expected format.
+- In n8n, all data passed between nodes is an array of objects. Each of these objects wraps another object with the json key:
+- To troubleshoot this error, check the following:
+- Read the data structure to understand the data you receive in the Code node and the requirements for outputting data from the node.
+- Understand how data items work and how to connect data items from previous nodes with item linking .
+- A 'Json' Property Isn'T An Object #
+- This error occurs when the Code node returns data where the json key isn't pointing to an object.
+- This may happen if you set json to a different data structure, like an array:
+- To resolve this, ensure that the json key references an object in your return data:
+- Code Doesn'T Return An Object #
+- This error may occur when your Code node doesn't return anything or if it returns an unexpected result.
+- To resolve this, ensure that your Code node returns the expected data structure :
+- This error may also occur if the code you provided returns 'undefined' instead of the expected result. In that case, ensure that the data you are referencing in your Code node exists in each execution and that it has the structure your code expects.
+- 'Import' And 'Export' May Only Appear At The Top Level #
+- This error occurs if you try to use import or export in the Code node. These aren't supported by n8n's JavaScript sandbox. Instead, use the require function to load modules.
+- To resolve this issue, try changing your import statements to use require :
+- Cannot Find Module '<Module>' #
+- This error occurs if you try to use require in the Code node and n8n can't find the module.
+- Only for self-hosted
+- n8n doesn't support importing modules in the Cloud version.
+- If you're self-hosting n8n, follow these steps:
+- Install the module into your n8n environment. If you are running n8n with npm , install the module in the same environment as n8n. If you are running n8n with Docker , you need to extend the official n8n image with a custom image that includes your module.
+- If you are running n8n with npm , install the module in the same environment as n8n.
+- If you are running n8n with Docker , you need to extend the official n8n image with a custom image that includes your module.
+- Set the NODE_FUNCTION_ALLOW_BUILTIN and NODE_FUNCTION_ALLOW_EXTERNAL environment variables to allow importing modules.
+- Using Global Variables #
+- Sometimes you may wish to set and retrieve simple global data related to a workflow across and within executions. For example, you may wish to include the date of the previous report when compiling a report with a list of project updates.
+- To set, update, and retrieve data directly to a workflow, use the static data functions within your code. You can manage data either globally or tied to specific nodes.
+- Use Remove Duplicates when possible
+- If you're interested in using variables to avoid processing the same data items more than once, consider using the Remove Duplicates node instead. The Remove Duplicates node can save information across executions to avoid processing the same items multiple times.
+- Can'T Access Credentials In A Code Node #
+- By design, Code nodes can't access credentials. They don't have access to n8n’s internal credential management system. This prevents exposure of sensitive authentication data.
+- Attempts to reference credentials in a Code node using expressions or methods like this.getCredentials() or $getCredentials() will result in errors, such as this.getCredentials is not a function and $getCredentials is not defined .
+- If you need to make authenticated API calls, use the HTTP Request node which provides credential support.
+- To work with credentials dynamically, handle the credential selection logic outside of the Code node:
+- Use a Switch node to route to different nodes with different credentials.
+- Use expressions directly in credential fields to select credentials dynamically based on previous node data.
+- Use an HTTP Request node with Custom Auth to dynamically set headers, query parameters, or body values using expressions.
+
+## Limitations And Gotchas
+Limitations:
+- Not present in source.
+Gotchas:
+- Not present in source.
+
+## Related Nodes
+- Not present in source.
+
+## AI Guidance
+Selection rules:
+- Not present in source.
+Disambiguation:
+- Not present in source.
+Prompt hints:
+- Not present in source.
+Retrieval keywords:
+- Not present in source.
+
+## Source
+- URL: https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.code/
+- Last verified: 2026-03-23

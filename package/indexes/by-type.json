@@ -1,0 +1,17 @@
+{
+  "action": [
+    "n8n.action.google-sheets"
+  ],
+  "cluster_root": [
+    "n8n.cluster-root.ai-agent-node"
+  ],
+  "cluster_sub": [
+    "n8n.cluster-sub.openai-chat-model-node"
+  ],
+  "core": [
+    "n8n.core.code-node"
+  ],
+  "trigger": [
+    "n8n.trigger.schedule-trigger-node"
+  ]
+}

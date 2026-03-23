@@ -1,0 +1,14 @@
+{
+  "nodes_total": 5,
+  "by_family": {
+    "action": 1,
+    "cluster_root": 1,
+    "cluster_sub": 1,
+    "core": 1,
+    "trigger": 1
+  },
+  "with_credentials_required": 0,
+  "with_operations_listed": 1,
+  "with_agent_guidance": 0,
+  "coverage_status": "partial"
+}
