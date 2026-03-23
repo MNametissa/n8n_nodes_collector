@@ -55,6 +55,28 @@ def write_report_json(payload: dict, path: Path) -> None:
 
 
 def run_refresh(mode: str) -> None:
-    """Placeholder for workflow orchestration."""
+    """Run a refresh workflow mode."""
 
-    raise NotImplementedError(f"The refresh workflow is not implemented yet: {mode}")
+    raise NotImplementedError("Use refresh_package with explicit paths.")
+
+
+def refresh_package(
+    mode: str,
+    input_dir: Path | None = None,
+    package_dir: Path | None = None,
+    reports_dir: Path | None = None,
+    cache_dir: Path | None = None,
+) -> Path:
+    """Dispatch refresh modes to the appropriate workflow."""
+
+    if mode not in {"daily", "weekly", "monthly"}:
+        raise ValueError(f"Unsupported refresh mode: {mode}")
+
+    if mode in {"daily", "weekly"}:
+        if input_dir is None:
+            raise ValueError(f"{mode} refresh requires input_dir")
+        return run_build(input_dir, package_dir=package_dir, reports_dir=reports_dir, cache_dir=cache_dir)
+
+    target_package_dir = package_dir or PACKAGE_DIR
+    validate_package(target_package_dir)
+    return target_package_dir

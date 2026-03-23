@@ -14,7 +14,7 @@ from .models import DiscoveryReport, ExtractionReport, FetchReport, NormalizeRep
 from .normalize import normalize_records, write_normalize_report
 from .render import render_package
 from .validate import PackageValidationError, validate_package
-from .workflows import run_build
+from .workflows import refresh_package, run_build
 
 app = typer.Typer(help="Collector for the n8n nodes knowledge package.")
 
@@ -121,6 +121,46 @@ def build(
 
     target = run_build(input_dir, package_dir=output_dir, reports_dir=reports_dir, cache_dir=cache_dir)
     typer.echo(f"Built {target}")
+
+
+@app.command()
+def refresh(
+    mode: str = typer.Option(..., "--mode", help="Refresh mode: daily, weekly, or monthly."),
+    input_dir: Path = typer.Option(
+        None,
+        "--input-dir",
+        help="Discovery HTML directory required for daily and weekly refresh.",
+    ),
+    package_dir: Path = typer.Option(
+        None,
+        "--package-dir",
+        help="Target package directory or existing package directory for monthly validation.",
+    ),
+    reports_dir: Path = typer.Option(
+        None,
+        "--reports-dir",
+        help="Directory to write intermediate JSON reports into for build-backed refreshes.",
+    ),
+    cache_dir: Path = typer.Option(
+        None,
+        "--cache-dir",
+        help="Directory to write raw HTML cache entries into for build-backed refreshes.",
+    ),
+) -> None:
+    """Run a refresh workflow mode."""
+
+    try:
+        target = refresh_package(
+            mode=mode,
+            input_dir=input_dir,
+            package_dir=package_dir,
+            reports_dir=reports_dir,
+            cache_dir=cache_dir,
+        )
+    except (PackageValidationError, ValueError) as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"Refreshed {target}")
 
 
 def main() -> None:

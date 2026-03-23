@@ -22,3 +22,5 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - render/validate tests covering success paths, CLI wiring, and a validator failure case
 - working `build` orchestration command for the full collector pipeline
 - end-to-end tests proving discover/fetch/extract/normalize/render/validate sequencing
+- working `refresh` command with `daily`, `weekly`, and `monthly` dispatch
+- provenance-aware source rendering and validation with real content hashes

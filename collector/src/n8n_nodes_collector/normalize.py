@@ -11,6 +11,7 @@ from .models import (
     AgentGuidance,
     CanonicalMapEntry,
     CanonicalNodeRecord,
+    CanonicalSourceRecord,
     ClusterConfig,
     CredentialsConfig,
     ExecutionRole,
@@ -18,6 +19,7 @@ from .models import (
     ExtractedNodeRecord,
     Family,
     NormalizeReport,
+    SourceType,
 )
 
 
@@ -27,10 +29,12 @@ def normalize_records(extraction_report: ExtractionReport, verified_at: str | No
     normalized_date = verified_at or date.today().isoformat()
     node_records: list[CanonicalNodeRecord] = []
     map_entries: list[CanonicalMapEntry] = []
+    source_records: list[CanonicalSourceRecord] = []
 
     for extracted in sorted(extraction_report.records, key=lambda item: (item.family_hint, item.node_url)):
         node = normalize_node_record(extracted, verified_at=normalized_date)
         node_records.append(node)
+        source_records.extend(normalize_source_records(extracted, node))
         map_entries.append(
             CanonicalMapEntry(
                 id=node.id,
@@ -53,7 +57,11 @@ def normalize_records(extraction_report: ExtractionReport, verified_at: str | No
             )
         )
 
-    return NormalizeReport(map_entries=map_entries, node_records=node_records)
+    return NormalizeReport(
+        map_entries=map_entries,
+        node_records=node_records,
+        source_records=source_records,
+    )
 
 
 def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> CanonicalNodeRecord:
@@ -107,6 +115,29 @@ def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> C
         last_verified_at=verified_at,
         status="active",
     )
+
+
+def normalize_source_records(
+    extracted: ExtractedNodeRecord,
+    node: CanonicalNodeRecord,
+) -> list[CanonicalSourceRecord]:
+    """Derive canonical source records from extracted provenance data."""
+
+    return [
+        CanonicalSourceRecord(
+            url=url,
+            node_id=node.id,
+            title=node.doc_title,
+            type=SourceType.NODE_PAGE if url == extracted.node_url else SourceType.SUPPORTING_PAGE,
+            family_hint=node.family,
+            collected_at=node.last_verified_at,
+            http_status=200,
+            content_hash=content_hash,
+            status="parsed",
+            notes="",
+        )
+        for url, content_hash in sorted(extracted.content_hashes.items())
+    ]
 
 
 def infer_credentials_required(extracted: ExtractedNodeRecord) -> bool:

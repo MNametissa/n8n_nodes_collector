@@ -114,6 +114,7 @@ def validate_map_entries(package_dir: Path, map_entries: list[dict]) -> None:
 
 def validate_nodes(package_dir: Path, map_entries: list[dict], sources: list[dict]) -> None:
     source_urls = {(source["url"], source["type"]) for source in sources}
+    source_by_url = {source["url"]: source for source in sources}
     for entry in map_entries:
         node_json = load_json(package_dir / entry["file_json"])
         node_md = (package_dir / entry["file_md"]).read_text(encoding="utf-8")
@@ -138,6 +139,11 @@ def validate_nodes(package_dir: Path, map_entries: list[dict], sources: list[dic
             raise PackageValidationError(f"Operations missing from source_sections_present for {entry['id']}")
         if (entry["doc_url"], "node_page") not in source_urls:
             raise PackageValidationError(f"Missing source record for {entry['id']}")
+        source_record = source_by_url[entry["doc_url"]]
+        if source_record["status"] != "parsed":
+            raise PackageValidationError(f"Source status mismatch for {entry['id']}")
+        if not source_record["content_hash"] or source_record["content_hash"] == "unknown":
+            raise PackageValidationError(f"Unknown source content_hash for {entry['id']}")
 
         for section in REQUIRED_NODE_MD_SECTIONS:
             if section not in node_md:

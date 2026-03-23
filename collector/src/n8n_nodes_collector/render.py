@@ -50,7 +50,7 @@ def render_package(
     )
     write_text(target / "map.md", render_map_markdown(normalize_report.node_records))
     write_json(target / "taxonomy.json", build_taxonomy())
-    write_json(target / "sources.json", build_sources(normalize_report.node_records))
+    write_json(target / "sources.json", build_sources(normalize_report))
     write_json(target / "stats.json", build_stats(normalize_report.node_records))
     render_indexes(normalize_report, target / "indexes")
     render_auxiliary(target / "auxiliary")
@@ -90,21 +90,10 @@ def build_taxonomy() -> dict:
     }
 
 
-def build_sources(node_records: list[CanonicalNodeRecord]) -> list[dict]:
+def build_sources(normalize_report: NormalizeReport) -> list[dict]:
     return [
-        {
-            "url": record.doc_url,
-            "node_id": record.id,
-            "title": record.doc_title,
-            "type": "node_page",
-            "family_hint": record.family,
-            "collected_at": record.last_verified_at,
-            "http_status": 200,
-            "content_hash": "unknown",
-            "status": "parsed",
-            "notes": "",
-        }
-        for record in sorted(node_records, key=lambda item: item.id)
+        record.model_dump(mode="json")
+        for record in sorted(normalize_report.source_records, key=lambda item: (item.node_id, item.url))
     ]
 
 

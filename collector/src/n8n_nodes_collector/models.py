@@ -250,6 +250,23 @@ class CanonicalMapEntry(BaseModel):
     status: str = "active"
 
 
+class CanonicalSourceRecord(BaseModel):
+    """Canonical source ledger record for rendering."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    url: str
+    node_id: str
+    title: str
+    type: SourceType
+    family_hint: Family
+    collected_at: str
+    http_status: int
+    content_hash: str
+    status: str = "parsed"
+    notes: str = ""
+
+
 class NormalizeReport(BaseModel):
     """Serializable normalization output."""
 
@@ -257,6 +274,7 @@ class NormalizeReport(BaseModel):
 
     map_entries: list[CanonicalMapEntry] = Field(default_factory=list)
     node_records: list[CanonicalNodeRecord] = Field(default_factory=list)
+    source_records: list[CanonicalSourceRecord] = Field(default_factory=list)
 
     def as_sorted_payload(self) -> dict[str, Any]:
         return {
@@ -267,6 +285,10 @@ class NormalizeReport(BaseModel):
             "node_records": [
                 record.model_dump(mode="json")
                 for record in sorted(self.node_records, key=lambda item: item.id)
+            ],
+            "source_records": [
+                record.model_dump(mode="json")
+                for record in sorted(self.source_records, key=lambda item: (item.node_id, item.url))
             ],
         }
 
