@@ -236,7 +236,7 @@ def normalize_node_record(extracted: ExtractedNodeRecord, verified_at: str) -> C
         description=summary,
         credentials=CredentialsConfig(
             required=credentials_required,
-            notes=first_value(extracted.section_text, "credentials") if credentials_required else "",
+            notes=first_matching_value(extracted.section_text, "credentials") if credentials_required else "",
         ),
         operations=operations,
         resource_groups=[],
@@ -335,11 +335,11 @@ def infer_credentials_required(extracted: ExtractedNodeRecord) -> bool:
     """Infer whether a node itself requires credentials."""
 
     if extracted.family_hint == Family.ACTION:
-        return bool(extracted.section_text.get("credentials"))
+        return bool(matching_section_values(extracted.section_text, "credentials"))
     if extracted.family_hint == Family.TRIGGER:
-        return bool(extracted.section_text.get("credentials"))
+        return bool(matching_section_values(extracted.section_text, "credentials"))
     if extracted.family_hint in {Family.CLUSTER_ROOT, Family.CLUSTER_SUB}:
-        return bool(extracted.section_text.get("credentials"))
+        return bool(matching_section_values(extracted.section_text, "credentials"))
     return False
 
 
@@ -793,6 +793,23 @@ def first_value(section_text: dict[str, list[str]], key: str) -> str:
     """Return the first value from a section if present."""
 
     values = section_text.get(key, [])
+    return values[0] if values else ""
+
+
+def matching_section_values(section_text: dict[str, list[str]], prefix: str) -> list[str]:
+    """Return merged values for an exact key or matching key prefix."""
+
+    merged: list[str] = []
+    for key, values in section_text.items():
+        if key == prefix or key.startswith(f"{prefix}_"):
+            merged.extend(values)
+    return clean_content_list(merged)
+
+
+def first_matching_value(section_text: dict[str, list[str]], prefix: str) -> str:
+    """Return the first merged value for matching section keys."""
+
+    values = matching_section_values(section_text, prefix)
     return values[0] if values else ""
 
 
