@@ -32,12 +32,14 @@ Install the repository-aligned routing skill into Codex and Claude Code:
 
 ```bash
 ./scripts/install-skill.sh
+collector install-skill
 ```
 
 Uninstall it:
 
 ```bash
 ./scripts/uninstall-skill.sh
+collector uninstall-skill
 ```
 
 The skill is installed into:
@@ -51,6 +53,9 @@ The skill is installed into:
 collector build-live --output-dir package --reports-dir .cache/n8n-nodes/reports --cache-dir .cache/n8n-nodes/raw --fetch-concurrency 24
 collector validate package
 collector audit-package package --output /tmp/n8n-audit.json
+collector install-skill
+collector uninstall-skill
+collector self-uninstall
 collector resolve package "odoo erp api" --limit 3
 collector resolve package "connect openrouter for ai classification and sorting" --limit 5
 ```

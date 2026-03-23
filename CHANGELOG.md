@@ -41,5 +41,6 @@ The format follows Keep a Changelog principles, and package versions use SemVer.
 - dedicated install and uninstall scripts for the collector CLI
 - dedicated install and uninstall scripts for the repository-aligned routing skill in Codex and Claude Code
 - a new `n8n-workflow-router` skill aligned with `collector resolve`, package indexes, aliases, and specialized-first routing rules
+- native CLI commands for skill install, skill uninstall, and collector self-uninstall
 - installer tests covering real CLI venv installation and skill link installation
 - broader resolver coverage for AI task-root and provider-node routing

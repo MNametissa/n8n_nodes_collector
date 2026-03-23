@@ -12,6 +12,16 @@ from .config import DEFAULT_FETCH_CONCURRENCY
 from .discovery import discover_from_directory, discover_from_live_sources
 from .extract import extract_records, write_extraction_report
 from .fetch import fetch_sources, write_fetch_report
+from .installers import (
+    default_bin_path,
+    default_claude_shared_skills_dir,
+    default_claude_skills_dir,
+    default_codex_skills_dir,
+    default_install_root,
+    install_skill,
+    uninstall_cli,
+    uninstall_skill,
+)
 from .models import DiscoveryReport, ExtractionReport, FetchReport, NormalizeReport
 from .normalize import normalize_records, write_normalize_report
 from .progress import TerminalProgressReporter
@@ -321,6 +331,90 @@ def resolve(
         expand_concurrency=expand_concurrency,
     )
     typer.echo(json.dumps(payload, indent=2) + "\n")
+
+
+@app.command("install-skill")
+def install_skill_command(
+    codex_dir: Path = typer.Option(
+        default_codex_skills_dir(),
+        "--codex-dir",
+        help="Codex skills directory.",
+    ),
+    claude_shared_dir: Path = typer.Option(
+        default_claude_shared_skills_dir(),
+        "--claude-shared-dir",
+        help="Claude shared skills directory.",
+    ),
+    claude_dir: Path = typer.Option(
+        default_claude_skills_dir(),
+        "--claude-dir",
+        help="Claude local skills directory.",
+    ),
+) -> None:
+    """Install the repository-aligned n8n routing skill into Codex and Claude Code."""
+
+    paths = install_skill(
+        codex_skills_dir=codex_dir,
+        claude_shared_skills_dir=claude_shared_dir,
+        claude_skills_dir=claude_dir,
+    )
+    typer.echo(f"Installed skill in Codex: {paths['codex']}")
+    typer.echo(f"Installed skill in Claude shared: {paths['claude_shared']}")
+    typer.echo(f"Installed skill in Claude local: {paths['claude_local']}")
+
+
+@app.command("uninstall-skill")
+def uninstall_skill_command(
+    codex_dir: Path = typer.Option(
+        default_codex_skills_dir(),
+        "--codex-dir",
+        help="Codex skills directory.",
+    ),
+    claude_shared_dir: Path = typer.Option(
+        default_claude_shared_skills_dir(),
+        "--claude-shared-dir",
+        help="Claude shared skills directory.",
+    ),
+    claude_dir: Path = typer.Option(
+        default_claude_skills_dir(),
+        "--claude-dir",
+        help="Claude local skills directory.",
+    ),
+) -> None:
+    """Uninstall the repository-aligned n8n routing skill from Codex and Claude Code."""
+
+    paths = uninstall_skill(
+        codex_skills_dir=codex_dir,
+        claude_shared_skills_dir=claude_shared_dir,
+        claude_skills_dir=claude_dir,
+    )
+    typer.echo(f"Uninstalled skill from Codex target: {paths['codex']}")
+    typer.echo(f"Uninstalled skill from Claude shared target: {paths['claude_shared']}")
+    typer.echo(f"Uninstalled skill from Claude local target: {paths['claude_local']}")
+
+
+@app.command("self-uninstall")
+def self_uninstall(
+    install_root: Path = typer.Option(
+        default_install_root(),
+        "--install-root",
+        help="Collector install root. Defaults to the detected dedicated install root.",
+    ),
+    bin_path: Path = typer.Option(
+        default_bin_path(),
+        "--bin-path",
+        help="Path to the exposed collector executable symlink.",
+    ),
+) -> None:
+    """Remove the installed collector CLI and its default binary link."""
+
+    try:
+        paths = uninstall_cli(install_root=install_root, bin_path=bin_path)
+    except ValueError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"Removed install root: {paths['install_root']}")
+    typer.echo(f"Removed bin link if matched: {paths['bin_path']}")
 
 
 def main() -> None:
